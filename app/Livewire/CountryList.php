@@ -15,6 +15,11 @@ class CountryList extends Component
     public $sortBy = 'name_asc';
 
 
+    public function getUserOrigin(): ?string
+    {
+        return Auth::user()?->origin;
+    }
+
     public function getUserName(): ?string
     {
         return Auth::user()?->name;

@@ -21,7 +21,7 @@
     </div>
 
     <div class="mb-6 flex items-center justify-between">
-        <flux:heading size="xl" level="1">Hey {{ $this->getUserName() }}, Welcome to the Country indexing site</flux:heading>
+        <flux:heading size="xl" level="1">Hey {{ $this->getUserName() }}, you are sailing from {{ $this->getUserOrigin() }} Welcome to the Country indexing site</flux:heading>
 
         <flux:dropdown position="bottom" align="end">
             <flux:button variant="ghost" icon="user-circle" size="sm">
