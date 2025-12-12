@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Country;
@@ -12,7 +13,12 @@ class CountryList extends Component
 
     public $search = '';
     public $sortBy = 'name_asc';
-    public $__name;
+    
+
+    public function getUserName(): ?string
+    {
+        return Auth::user()?->name;
+    }
 
     public function updatedSearch(): void
     {

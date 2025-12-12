@@ -1,5 +1,11 @@
 <div class="flex items-start max-md:flex-col">
     <div class="me-10 w-full pb-4 md:w-[220px]">
+        <div class="mb-4">
+            <flux:button variant="ghost" size="sm" icon="arrow-left" onclick="history.back()">
+                Back
+            </flux:button>
+        </div>
+
         <flux:navlist>
             <flux:navlist.item :href="route('profile.edit')" wire:navigate>{{ __('Profile') }}</flux:navlist.item>
             <flux:navlist.item :href="route('user-password.edit')" wire:navigate>{{ __('Password') }}</flux:navlist.item>

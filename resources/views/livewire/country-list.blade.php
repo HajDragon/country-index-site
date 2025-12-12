@@ -10,21 +10,31 @@
             />
         </div>
         <div class="w-64">
-            <flux:select wire:model.live="sortBy" class="w-full">
+           <flux:select wire:model.live="sortBy" class="w-full">
                 <option value="name_asc">Name (A-Z)</option>
                 <option value="name_desc">Name (Z-A)</option>
                 <option value="population_desc">Population (High to Low)</option>
                 <option value="population_asc">Population (Low to High)</option>
-                <option value="Continent">Continent</option>
-            </flux:select>
+                <option value="continent">Continent</option>
+           </flux:select>
         </div>
     </div>
 
+    <div class="mb-6 flex items-center justify-between">
+        <flux:heading size="xl" level="1">Hey {{ $this->getUserName() }}, Welcome to the Country indexing site</flux:heading>
 
-    <div class="mb-6">
-        <flux:heading size="xl" level="1">Hey {{ $user }}Welcome to the Country indexing site</flux:heading>
-        <flux:subheading size="lg" class="mb-6"></flux:subheading>
+        <flux:dropdown position="bottom" align="end">
+            <flux:button variant="ghost" icon="user-circle" size="sm">
+                {{ $this->getUserName() }}
+            </flux:button>
 
+            <flux:menu>
+
+                <flux:menu.item icon="cog" href="/settings">Settings</flux:menu.item>
+                <flux:menu.separator />
+                <flux:menu.item icon="arrow-right-start-on-rectangle" href="/logout">Logout</flux:menu.item>
+            </flux:menu>
+        </flux:dropdown>
     </div>
 
     <div class="grid auto-rows-min gap-4 md:grid-cols-3 lg:grid-cols-4">
