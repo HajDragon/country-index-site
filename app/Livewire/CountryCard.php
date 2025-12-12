@@ -14,7 +14,7 @@ class CountryCard extends Component
     public function mount($countryCode)
     {
         $this->countryCode = $countryCode;
-        $this->country = Country::where('Code', $countryCode)->with('cities')->first();
+        $this->country = Country::where('Code', $countryCode)->with(['cities', 'capitalCity'])->first();
     }
 
     public function render()

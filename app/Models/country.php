@@ -42,4 +42,8 @@ class Country extends Model
     public function languages(){
         return $this->hasMany(CountryLanguage::class, 'CountryCode', 'Code');
     }
+
+    public function capitalCity(){
+        return $this->belongsTo(City::class, 'Capital', 'ID');
+    }
 }
