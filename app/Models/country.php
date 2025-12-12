@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Country extends Model
 {
     /** @use HasFactory<\Database\Factories\CountryFactory> */
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $table = 'country';
     protected $primaryKey = 'Code';
@@ -45,5 +46,19 @@ class Country extends Model
 
     public function capitalCity(){
         return $this->belongsTo(City::class, 'Capital', 'ID');
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'Code' => $this->Code,
+            'Name' => $this->Name,
+            'Continent' => $this->Continent,
+            'Region' => $this->Region,
+            'Capital' => $this->capitalCity?->Name,
+        ];
     }
 }

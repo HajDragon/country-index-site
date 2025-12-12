@@ -1,4 +1,32 @@
 <div>
+    {{-- Search and Sort --}}
+    <div class="mb-6 flex gap-4">
+        <div class="flex-1">
+            <flux:input
+                wire:model.live.debounce.300ms="search"
+                type="text"
+                placeholder="Search countries by name, region, or capital..."
+                class="w-full"
+            />
+        </div>
+        <div class="w-64">
+            <flux:select wire:model.live="sortBy" class="w-full">
+                <option value="name_asc">Name (A-Z)</option>
+                <option value="name_desc">Name (Z-A)</option>
+                <option value="population_desc">Population (High to Low)</option>
+                <option value="population_asc">Population (Low to High)</option>
+                <option value="Continent">Continent</option>
+            </flux:select>
+        </div>
+    </div>
+
+
+    <div class="mb-6">
+        <flux:heading size="xl" level="1">Hey {{ $user }}Welcome to the Country indexing site</flux:heading>
+        <flux:subheading size="lg" class="mb-6"></flux:subheading>
+
+    </div>
+
     <div class="grid auto-rows-min gap-4 md:grid-cols-3 lg:grid-cols-4">
         @foreach($countries as $country)
             <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
