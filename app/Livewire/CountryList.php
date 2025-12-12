@@ -13,7 +13,7 @@ class CountryList extends Component
 
     public $search = '';
     public $sortBy = 'name_asc';
-    
+
 
     public function getUserName(): ?string
     {
@@ -41,6 +41,7 @@ class CountryList extends Component
         return view('livewire.country-list', [
             'countries' => $countries
         ]);
+
     }
 
     protected function applySorting($query)

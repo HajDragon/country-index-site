@@ -9,11 +9,13 @@ use App\Http\Requests\UpdatecountryRequest;
 class CountryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display the specified country view.
      */
-    public function index()
+    public function index(string $countryCode)
     {
-        //
+        return view('layouts.country-view', [
+            'countryCode' => $countryCode,
+        ]);
     }
 
     /**
@@ -27,7 +29,7 @@ class CountryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorecountryRequest $request)
+    public function store(StoreCountryRequest $request)
     {
         //
     }
