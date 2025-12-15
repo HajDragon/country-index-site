@@ -7,7 +7,6 @@ use App\Exports\CountriesExport;
 use App\Http\Requests\StorecountryRequest;
 use App\Http\Requests\UpdatecountryRequest;
 use App\Models\Country;
-use App\Models\country;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CountryController extends Controller
