@@ -1,5 +1,19 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ theme: '{{ auth()->user()?->theme ?? 'system' }}' }" :class="{ 'dark': theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) }" @theme-updated.window="theme = $event.detail.theme; document.documentElement.classList.toggle('dark', theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches))">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ 
+    theme: '{{ auth()->user()?->theme ?? 'system' }}',
+    applyTheme() {
+        const isDark = this.theme === 'dark' || (this.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    },
+    init() {
+        this.applyTheme();
+        document.addEventListener('livewire:navigating', () => this.applyTheme());
+    }
+}" :class="{ 'dark': theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) }" @update-theme.window="theme = $event.detail.theme; applyTheme()">
     <head>
         @include('partials.head')
     </head>

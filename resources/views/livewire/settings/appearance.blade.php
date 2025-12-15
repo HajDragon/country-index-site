@@ -1,6 +1,5 @@
 <?php
 
-use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -11,21 +10,12 @@ new class extends Component {
         $this->theme = auth()->user()->theme ?? 'system';
     }
 
-    #[On('updated-theme')]
-    public function updateTheme(): void
+    public function updatedTheme(): void
     {
         auth()->user()->update(['theme' => $this->theme]);
-        // Update HTML class immediately with JavaScript
-        $this->js(<<<'JS'
-            const theme = @js($this->theme);
-            const html = document.documentElement;
-            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            if (isDark) {
-                html.classList.add('dark');
-            } else {
-                html.classList.remove('dark');
-            }
-        JS);
+        
+        // Dispatch JavaScript to update the theme immediately
+        $this->dispatch('update-theme', theme: $this->theme);
     }
 }; ?>
 
