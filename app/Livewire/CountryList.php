@@ -232,3 +232,5 @@ class CountryList extends Component
         }
 
         return $query;
+    }
+}
