@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ 
-    theme: '{{ auth()->user()?->theme ?? 'system' }}',
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{
+    theme: localStorage.getItem('app-theme') || '{{ auth()->user()?->theme ?? 'system' }}',
     applyTheme() {
         const isDark = this.theme === 'dark' || (this.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
         if (isDark) {
@@ -8,6 +8,7 @@
         } else {
             document.documentElement.classList.remove('dark');
         }
+        localStorage.setItem('app-theme', this.theme);
     },
     init() {
         this.applyTheme();

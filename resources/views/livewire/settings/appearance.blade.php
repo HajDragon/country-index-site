@@ -13,7 +13,7 @@ new class extends Component {
     public function updatedTheme(): void
     {
         auth()->user()->update(['theme' => $this->theme]);
-        
+
         // Dispatch JavaScript to update the theme immediately
         $this->dispatch('update-theme', theme: $this->theme);
     }
