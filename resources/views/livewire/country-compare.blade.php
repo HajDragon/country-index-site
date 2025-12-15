@@ -9,6 +9,7 @@
             <flux:subheading>Select 2–3 countries to compare side-by-side.</flux:subheading>
         </div>
         <div class="flex items-center gap-2">
+            <livewire:actions.dark-mode-toggle />
             <flux:input
                 wire:model.live.debounce.300ms="query"
                 placeholder="Search by name or code (e.g., USA)"

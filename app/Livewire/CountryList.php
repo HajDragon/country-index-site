@@ -2,10 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Exports\CountriesExport;
 use App\Models\Country;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CountryList extends Component
 {
@@ -157,5 +160,77 @@ class CountryList extends Component
             'population_asc' => $query->orderBy('Population', 'asc'),
             default => $query->orderBy('Name', 'asc'),
         };
+    }
+
+    public function exportCsv()
+    {
+        $query = $this->getFilteredCountriesQuery();
+        $filename = 'countries-'.now()->format('Y-m-d-His').'.xlsx';
+
+        return Excel::download(new CountriesExport($query), $filename);
+    }
+
+    public function exportPdf()
+    {
+        $countries = $this->getFilteredCountriesQuery()->get();
+        $pdf = Pdf::loadView('exports.countries-pdf', [
+            'countries' => $countries,
+            'totalCount' => $countries->count(),
+            'exportedAt' => now()->format('F j, Y \a\t g:i A'),
+        ]);
+        $filename = 'countries-'.now()->format('Y-m-d-His').'.pdf';
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, $filename, ['Content-Type' => 'application/pdf']);
+    }
+
+    private function getFilteredCountriesQuery()
+    {
+        $query = Country::query();
+
+        if ($this->search) {
+            $searchTerm = "%{$this->search}%";
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('Name', 'like', $searchTerm)
+                    ->orWhere('Region', 'like', $searchTerm)
+                    ->orWhereHas('capitalCity', function ($q) use ($searchTerm) {
+                        $q->where('Name', 'like', $searchTerm);
+                    });
+            });
+        }
+
+        if (! empty($this->selectedContinents)) {
+            $query->whereIn('Continent', $this->selectedContinents);
+        }
+
+        if (! empty($this->selectedRegions)) {
+            $query->whereIn('Region', $this->selectedRegions);
+        }
+
+        if ($this->populationMin > 0) {
+            $query->where('Population', '>=', $this->populationMin);
+        }
+
+        if ($this->populationMax > 0) {
+            $query->where('Population', '<=', $this->populationMax);
+        }
+
+        if ($this->lifeExpectancyMin > 0) {
+            $query->where('LifeExpectancy', '>=', $this->lifeExpectancyMin);
+        }
+
+        if ($this->lifeExpectancyMax < 100) {
+            $query->where('LifeExpectancy', '<=', $this->lifeExpectancyMax);
+        }
+
+        if ($this->showFavoritesOnly && Auth::check()) {
+            $favoriteCountryCodes = Auth::user()->favoriteCountries()
+                ->pluck('country_code')
+                ->toArray();
+            $query->whereIn('Code', $favoriteCountryCodes);
+        }
+
+        return $query;
     }
 }

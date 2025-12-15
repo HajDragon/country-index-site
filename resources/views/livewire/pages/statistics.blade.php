@@ -64,9 +64,12 @@ new class extends Component {
                 <flux:heading size="2xl" level="1">World Statistics</flux:heading>
                 <p class="mt-2 text-gray-600 dark:text-gray-400">Global country data insights and analytics</p>
             </div>
-            <a href="{{ route('home') }}" wire:navigate class="text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                ← Back to Countries
-            </a>
+            <div class="flex items-center gap-3">
+                <livewire:actions.dark-mode-toggle />
+                <a href="{{ route('home') }}" wire:navigate class="text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                    ← Back to Countries
+                </a>
+            </div>
         </div>
 
         {{-- Main Stats Grid --}}

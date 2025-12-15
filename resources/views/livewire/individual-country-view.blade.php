@@ -1,10 +1,15 @@
 <div class="mx-auto max-w-5xl">
     {{-- Country Header with Flag --}}
-    <div class="mb-8 flex items-center gap-6">
-        <img src="https://flagsapi.com/{{ $country->Code2 }}/flat/64.png" alt="{{ $country->Name }} flag" class="h-16 w-24 rounded shadow-md">
-        <div>
-            <flux:heading size="2xl">{{ $country->Name }}</flux:heading>
-            <flux:subheading>{{ $country->LocalName ?? $country->Name }}</flux:subheading>
+    <div class="mb-8 flex items-center justify-between gap-6">
+        <div class="flex items-center gap-6">
+            <img src="https://flagsapi.com/{{ $country->Code2 }}/flat/64.png" alt="{{ $country->Name }} flag" class="h-16 w-24 rounded shadow-md">
+            <div>
+                <flux:heading size="2xl">{{ $country->Name }}</flux:heading>
+                <flux:subheading>{{ $country->LocalName ?? $country->Name }}</flux:subheading>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <livewire:actions.dark-mode-toggle />
         </div>
     </div>
      <flux:button variant="ghost" size="sm" icon="arrow-left" onclick="window.location='{{ route('home') }}'">
@@ -13,7 +18,7 @@
 
     <div class="grid gap-6 md:grid-cols-2">
         {{-- General Information --}}
-        <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900">
+        <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
             <flux:heading size="lg" class="mb-4">General Information</flux:heading>
             <div class="space-y-3 text-sm">
                 <div class="flex justify-between">
@@ -42,7 +47,7 @@
         </div>
 
         {{-- Demographics & Economy --}}
-        <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900">
+        <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
             <flux:heading size="lg" class="mb-4">Demographics & Economy</flux:heading>
             <div class="space-y-3 text-sm">
                 <div class="flex justify-between">
@@ -69,7 +74,7 @@
         </div>
 
         {{-- Government --}}
-        <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900">
+        <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
             <flux:heading size="lg" class="mb-4">Government</flux:heading>
             <div class="space-y-3 text-sm">
                 @if($country->GovernmentForm)
@@ -88,7 +93,7 @@
         </div>
 
         {{-- Languages --}}
-        <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900">
+        <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
             <flux:heading size="lg" class="mb-4">Languages ({{ $country->languages->count() }})</flux:heading>
             <div class="max-h-48 space-y-2 overflow-y-auto text-sm">
                 @forelse($country->languages->sortByDesc('Percentage') as $language)
@@ -109,7 +114,7 @@
     </div>
 
     {{-- Cities Section --}}
-    <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900">
+    <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
         <flux:heading size="lg" class="mb-4">Cities ({{ $cities->total() }})</flux:heading>
         <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             @forelse($cities as $city)
