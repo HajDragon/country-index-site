@@ -20,6 +20,7 @@ yarn-error.log
 /.idea
 meilisearch-*.exe
 world-db/
+/data.ms/
 /.nova
 /.vscode
 /.zed
