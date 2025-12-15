@@ -44,4 +44,8 @@ Route::middleware(['auth'])->group(function () {
     // Statistics and Favorites pages
     Volt::route('stats', 'pages.statistics')->name('stats');
     Volt::route('favorites', 'pages.favorites')->name('favorites');
+
+    // Export routes
+    Route::get('export/countries/csv', [CountryController::class, 'exportCsv'])->name('export.countries.csv');
+    Route::get('export/countries/pdf', [CountryController::class, 'exportPdf'])->name('export.countries.pdf');
 });

@@ -104,20 +104,47 @@
     <div class="mb-6 flex items-center justify-between">
         <flux:heading size="xl" level="1">Hey {{ Auth::user()->name }}, you are sailing from {{ Auth::user()->origin }} Welcome to the Country indexing site</flux:heading>
 
-        <flux:dropdown position="bottom" align="end">
-            <flux:button variant="ghost" icon="user-circle" size="sm">
-                {{ Auth::user()->name }}
-            </flux:button>
+        <div class="flex gap-3">
+            {{-- Export Buttons --}}
+            <flux:dropdown position="bottom" align="end">
+                <flux:button variant="ghost" icon="arrow-down-tray" size="sm">
+                    Export
+                </flux:button>
 
-            <flux:menu>
-                <flux:menu.item icon="star" href="/favorites">My Favorites</flux:menu.item>
-                <flux:menu.item icon="chart-bar" href="/stats">Statistics</flux:menu.item>
-                <flux:menu.item icon="cog" href="/settings">Settings</flux:menu.item>
-                <flux:menu.separator />
-                <form method="POST" action="{{ route('logout') }}" class="w-full">
-                    @csrf
-                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
-                        {{ __('Log Out') }}
+                <flux:menu>
+                    <flux:menu.item icon="document-text"
+                        @click="window.location.href = `{{ route('export.countries.csv') }}?continents={{ urlencode(implode(',', $selectedContinents ?? [])) }}&regions={{ urlencode(implode(',', $selectedRegions ?? [])) }}&population_min={{ $populationMin }}&population_max={{ $populationMax }}&life_expectancy_min={{ $lifeExpectancyMin }}&life_expectancy_max={{ $lifeExpectancyMax }}&search={{ urlencode($search) }}`"
+                    >
+                        Download CSV
+                    </flux:menu.item>
+                    <flux:menu.item icon="document-pdf"
+                        @click="window.location.href = `{{ route('export.countries.pdf') }}?continents={{ urlencode(implode(',', $selectedContinents ?? [])) }}&regions={{ urlencode(implode(',', $selectedRegions ?? [])) }}&population_min={{ $populationMin }}&population_max={{ $populationMax }}&life_expectancy_min={{ $lifeExpectancyMin }}&life_expectancy_max={{ $lifeExpectancyMax }}&search={{ urlencode($search) }}`"
+                    >
+                        Download PDF
+                    </flux:menu.item>
+                </flux:menu>
+            </flux:dropdown>
+
+            <flux:dropdown position="bottom" align="end">
+                <flux:button variant="ghost" icon="user-circle" size="sm">
+                    {{ Auth::user()->name }}
+                </flux:button>
+
+                <flux:menu>
+                    <flux:menu.item icon="star" href="/favorites">My Favorites</flux:menu.item>
+                    <flux:menu.item icon="chart-bar" href="/stats">Statistics</flux:menu.item>
+                    <flux:menu.item icon="cog" href="/settings">Settings</flux:menu.item>
+                    <flux:menu.separator />
+                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                        @csrf
+                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
+                            {{ __('Log Out') }}
+                        </flux:menu.item>
+                    </form>
+                </flux:menu>
+            </flux:dropdown>
+        </div>
+    </div>
                     </flux:menu.item>
                 </form>
             </flux:menu>
