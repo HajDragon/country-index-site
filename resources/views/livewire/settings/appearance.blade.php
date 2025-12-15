@@ -16,6 +16,8 @@ new class extends Component {
     {
         auth()->user()->update(['theme' => $this->theme]);
         $this->dispatch('theme-updated', theme: $this->theme);
+        // Also dispatch to window for Alpine to pick up
+        $this->dispatch('theme-updated', ['theme' => $this->theme])->to('window');
     }
 }; ?>
 

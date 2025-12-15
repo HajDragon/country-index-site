@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" :class="{ 'dark': $flux.appearance === 'dark' || ($flux.appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) }" x-data x-init="$watch('$flux.appearance', value => { localStorage.setItem('theme', value); if (value === 'system') { document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches); } else { document.documentElement.classList.toggle('dark', value === 'dark'); } })">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ theme: '{{ auth()->user()?->theme ?? 'system' }}' }" :class="{ 'dark': theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) }" @theme-updated.window="theme = $event.detail.theme; document.documentElement.classList.toggle('dark', theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches))">
     <head>
         @include('partials.head')
     </head>
