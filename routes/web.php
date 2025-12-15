@@ -8,32 +8,36 @@ use Livewire\Volt\Volt;
 Route::get('/', function () {
     return view('dashboard');
 })->name('home')
-->middleware('auth');
+    ->middleware('auth');
 
+Route::view('dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
-    Route::view('dashboard', 'dashboard')
-        ->middleware(['auth', 'verified'])
-        ->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::redirect('settings', 'settings/profile');
 
-    Route::middleware(['auth'])->group(function () {
-        Route::redirect('settings', 'settings/profile');
+    Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
+    Volt::route('settings/password', 'settings.password')->name('user-password.edit');
+    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
 
-        Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
-        Volt::route('settings/password', 'settings.password')->name('user-password.edit');
-        Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    Volt::route('settings/two-factor', 'settings.two-factor')
+        ->middleware(
+            when(
+                Features::canManageTwoFactorAuthentication()
+                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
+                ['password.confirm'],
+                [],
+            ),
+        )
+        ->name('two-factor.show');
 
-        Volt::route('settings/two-factor', 'settings.two-factor')
-            ->middleware(
-                when(
-                    Features::canManageTwoFactorAuthentication()
-                        && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
-                    ['password.confirm'],
-                    [],
-                ),
-            )
-            ->name('two-factor.show');
+    Route::get('country', fn () => redirect()->route('home'));
 
-        Route::get('country', fn() => redirect()->route('home'));
+    Route::get('country/{countryCode}', [CountryController::class, 'index'])->name('country.view');
 
-        Route::get('country/{countryCode}', [CountryController::class, 'index'])->name('country.view');
-    });
+    // Country comparison page
+    Route::get('compare', function () {
+        return view('layouts.compare');
+    })->name('countries.compare');
+});
