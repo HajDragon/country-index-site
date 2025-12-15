@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{
-    theme: localStorage.getItem('app-theme') || '{{ auth()->user()?->theme ?? 'system' }}',
-    applyTheme() {
-        const isDark = this.theme === 'dark' || (this.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-        localStorage.setItem('app-theme', this.theme);
-    },
-    init() {
-        this.applyTheme();
-        document.addEventListener('livewire:navigating', () => this.applyTheme());
-    }
-}" :class="{ 'dark': theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) }" @update-theme.window="theme = $event.detail.theme; applyTheme()">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        <script>
+            // Apply theme immediately before page renders to prevent flash
+            (function() {
+                const theme = localStorage.getItem('app-theme') || '{{ auth()->user()?->theme ?? 'system' }}';
+                const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                }
+            })();
+        </script>
         @include('partials.head')
     </head>
+    <body class="min-h-screen bg-white dark:bg-zinc-800" x-data="{
+        theme: localStorage.getItem('app-theme') || '{{ auth()->user()?->theme ?? 'system' }}',
+        applyTheme() {
+            const isDark = this.theme === 'dark' || (this.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('app-theme', this.theme);
+        }
+    }" @update-theme.window="theme = $event.detail.theme; applyTheme()" x-init="applyTheme()">
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         {{-- <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
