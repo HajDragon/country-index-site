@@ -141,11 +141,6 @@
             </flux:dropdown>
         </div>
     </div>
-                    </flux:menu.item>
-                </form>
-            </flux:menu>
-        </flux:dropdown>
-    </div>
 
     <div class="grid auto-rows-min gap-4 md:grid-cols-3 lg:grid-cols-4">
         @foreach($countries as $country)
