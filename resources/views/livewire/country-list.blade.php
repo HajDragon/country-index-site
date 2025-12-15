@@ -112,14 +112,10 @@
                 </flux:button>
 
                 <flux:menu>
-                    <flux:menu.item icon="document-text"
-                        @click="window.location.href = `{{ route('export.countries.csv') }}?continents={{ urlencode(implode(',', $selectedContinents ?? [])) }}&regions={{ urlencode(implode(',', $selectedRegions ?? [])) }}&population_min={{ $populationMin }}&population_max={{ $populationMax }}&life_expectancy_min={{ $lifeExpectancyMin }}&life_expectancy_max={{ $lifeExpectancyMax }}&search={{ urlencode($search) }}`"
-                    >
+                    <flux:menu.item icon="document-text" wire:click="exportCsv">
                         Download CSV
                     </flux:menu.item>
-                    <flux:menu.item icon="document-pdf"
-                        @click="window.location.href = `{{ route('export.countries.pdf') }}?continents={{ urlencode(implode(',', $selectedContinents ?? [])) }}&regions={{ urlencode(implode(',', $selectedRegions ?? [])) }}&population_min={{ $populationMin }}&population_max={{ $populationMax }}&life_expectancy_min={{ $lifeExpectancyMin }}&life_expectancy_max={{ $lifeExpectancyMax }}&search={{ urlencode($search) }}`"
-                    >
+                    <flux:menu.item icon="document-pdf" wire:click="exportPdf">
                         Download PDF
                     </flux:menu.item>
                 </flux:menu>
