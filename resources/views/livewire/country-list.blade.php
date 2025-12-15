@@ -21,18 +21,22 @@
     </div>
 
     <div class="mb-6 flex items-center justify-between">
-        <flux:heading size="xl" level="1">Hey {{ $this->getUserName() }}, you are sailing from {{ $this->getUserOrigin() }} Welcome to the Country indexing site</flux:heading>
+        <flux:heading size="xl" level="1">Hey {{ Auth::user()->name }}, you are sailing from {{ Auth::user()->origin }} Welcome to the Country indexing site</flux:heading>
 
         <flux:dropdown position="bottom" align="end">
             <flux:button variant="ghost" icon="user-circle" size="sm">
-                {{ $this->getUserName() }}
+                {{ Auth::user()->name }}
             </flux:button>
 
             <flux:menu>
-
                 <flux:menu.item icon="cog" href="/settings">Settings</flux:menu.item>
                 <flux:menu.separator />
-                <flux:menu.item icon="arrow-right-start-on-rectangle" href="/logout">Logout</flux:menu.item>
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
+                        {{ __('Log Out') }}
+                    </flux:menu.item>
+                </form>
             </flux:menu>
         </flux:dropdown>
     </div>

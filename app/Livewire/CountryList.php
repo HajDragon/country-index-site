@@ -2,28 +2,17 @@
 
 namespace App\Livewire;
 
-use Illuminate\Support\Facades\Auth;
+use App\Models\Country;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Country;
 
 class CountryList extends Component
 {
     use WithPagination;
 
     public $search = '';
+
     public $sortBy = 'name_asc';
-
-
-    public function getUserOrigin(): ?string
-    {
-        return Auth::user()?->origin;
-    }
-
-    public function getUserName(): ?string
-    {
-        return Auth::user()?->name;
-    }
 
     public function updatedSearch(): void
     {
@@ -38,20 +27,20 @@ class CountryList extends Component
     public function render()
     {
         $query = $this->search
-            ? Country::search($this->search)->query(fn($query) => $this->applySorting($query))
+            ? Country::search($this->search)->query(fn ($query) => $this->applySorting($query))
             : $this->applySorting(Country::query());
 
         $countries = $query->paginate(12);
 
         return view('livewire.country-list', [
-            'countries' => $countries
+            'countries' => $countries,
         ]);
 
     }
 
     protected function applySorting($query)
     {
-        return match($this->sortBy) {
+        return match ($this->sortBy) {
             'Continent' => $query->orderBy('Region', 'asc')->orderBy('Name', 'asc'),
             'name_asc' => $query->orderBy('Name', 'asc'),
             'name_desc' => $query->orderBy('Name', 'desc'),
