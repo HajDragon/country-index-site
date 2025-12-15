@@ -104,7 +104,9 @@
     <div class="mb-6 flex items-center justify-between">
         <flux:heading size="xl" level="1">Hey {{ Auth::user()->name }}, you are sailing from {{ Auth::user()->origin }} Welcome to the Country indexing site</flux:heading>
 
-        <div class="flex gap-3">
+        <div class="flex items-center gap-3">
+            {{-- Dark Mode Toggle --}}
+            <livewire:actions.dark-mode-toggle />
             {{-- Export Buttons --}}
             <flux:dropdown position="bottom" align="end">
                 <flux:button variant="ghost" icon="arrow-down-tray" size="sm">
