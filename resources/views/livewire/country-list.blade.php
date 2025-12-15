@@ -112,10 +112,10 @@
                 </flux:button>
 
                 <flux:menu>
-                    <flux:menu.item icon="document-text" wire:click="exportCsv">
+                    <flux:menu.item icon="document" wire:click="exportCsv">
                         Download CSV
                     </flux:menu.item>
-                    <flux:menu.item icon="document-pdf" wire:click="exportPdf">
+                    <flux:menu.item icon="arrow-down-tray" wire:click="exportPdf">
                         Download PDF
                     </flux:menu.item>
                 </flux:menu>
