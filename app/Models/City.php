@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class City extends Model
 {
     protected $table = 'city';
+
     protected $primaryKey = 'ID';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -18,7 +20,8 @@ class City extends Model
 
     ];
 
-    public function country(){
+    public function country()
+    {
         return $this->belongsTo(Country::class, 'CountryCode', 'Code');
     }
 }

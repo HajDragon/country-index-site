@@ -12,10 +12,14 @@ new class extends Component {
 
     public function updatedTheme(): void
     {
+        // Save theme preference to database
         auth()->user()->update(['theme' => $this->theme]);
 
-        // Dispatch JavaScript to update the theme immediately
-        $this->dispatch('update-theme', theme: $this->theme);
+        // Refresh the current user to get updated theme
+        auth()->user()->refresh();
+
+        // Redirect to current page to apply theme
+        return redirect()->to(request()->url());
     }
 }; ?>
 

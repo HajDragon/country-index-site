@@ -11,6 +11,7 @@ class IndividualCountryView extends Component
     use WithPagination;
 
     public string $countryCode;
+
     public ?Country $country = null;
 
     public function mount(string $countryCode): void
@@ -28,7 +29,7 @@ class IndividualCountryView extends Component
             ->paginate(12);
 
         return view('livewire.individual-country-view', [
-            'cities' => $cities
+            'cities' => $cities,
         ]);
     }
 }
