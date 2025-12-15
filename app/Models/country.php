@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
 
 class Country extends Model
@@ -12,9 +13,13 @@ class Country extends Model
     use HasFactory, Searchable;
 
     protected $table = 'country';
+
     protected $primaryKey = 'Code';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -35,16 +40,18 @@ class Country extends Model
         'Code2',
     ];
 
-
-    public function cities(){
+    public function cities()
+    {
         return $this->hasMany(City::class, 'CountryCode', 'Code');
     }
 
-    public function languages(){
+    public function languages()
+    {
         return $this->hasMany(CountryLanguage::class, 'CountryCode', 'Code');
     }
 
-    public function capitalCity(){
+    public function capitalCity()
+    {
         return $this->belongsTo(City::class, 'Capital', 'ID');
     }
 
@@ -60,5 +67,13 @@ class Country extends Model
             'Region' => $this->Region,
             'Capital' => $this->capitalCity?->Name,
         ];
+    }
+
+    /**
+     * Get the country's user favorites
+     */
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(UserFavorite::class, 'country_code', 'Code');
     }
 }

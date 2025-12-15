@@ -40,4 +40,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('compare', function () {
         return view('layouts.compare');
     })->name('countries.compare');
+
+    // Statistics and Favorites pages
+    Volt::route('stats', 'pages.statistics')->name('stats');
+    Volt::route('favorites', 'pages.favorites')->name('favorites');
 });

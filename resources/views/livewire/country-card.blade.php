@@ -21,7 +21,20 @@
     </a>
 
     @if($country)
-    <div class="absolute right-2 top-2">
+    <div class="absolute right-2 top-2 flex gap-2">
+        <button
+            wire:click="toggleFavorite"
+            wire:loading.attr="disabled"
+            class="rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white shadow hover:bg-red-700 disabled:opacity-50"
+            onclick="event.stopPropagation();"
+            title="{{ $isFavorite ? 'Remove from favorites' : 'Add to favorites' }}"
+        >
+            @if($isFavorite)
+                ❤️
+            @else
+                🤍
+            @endif
+        </button>
         <a
             href="{{ route('countries.compare', ['codes' => $country->Code]) }}"
             wire:navigate
