@@ -15,9 +15,17 @@ new class extends Component {
     public function updateTheme(): void
     {
         auth()->user()->update(['theme' => $this->theme]);
-        $this->dispatch('theme-updated', theme: $this->theme);
-        // Also dispatch to window for Alpine to pick up
-        $this->dispatch('theme-updated', ['theme' => $this->theme])->to('window');
+        // Update HTML class immediately with JavaScript
+        $this->js(<<<'JS'
+            const theme = @js($this->theme);
+            const html = document.documentElement;
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) {
+                html.classList.add('dark');
+            } else {
+                html.classList.remove('dark');
+            }
+        JS);
     }
 }; ?>
 
