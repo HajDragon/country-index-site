@@ -38,6 +38,19 @@ class Country extends Model
         'HeadOfState',
         'Capital',
         'Code2',
+        'latitude',
+        'longitude',
+    ];
+
+    protected $casts = [
+        'latitude' => 'decimal:7',
+        'longitude' => 'decimal:7',
+        'SurfaceArea' => 'decimal:2',
+        'Population' => 'integer',
+        'LifeExpectancy' => 'decimal:1',
+        'GNP' => 'decimal:2',
+        'GNPOld' => 'decimal:2',
+        'IndepYear' => 'integer',
     ];
 
     public function cities()
@@ -75,5 +88,39 @@ class Country extends Model
     public function favorites(): HasMany
     {
         return $this->hasMany(UserFavorite::class, 'country_code', 'Code');
+    }
+
+    /**
+     * Get neighboring countries from REST Countries API
+     *
+     * @return array<int, array{code: string, name: string}>
+     */
+    public function getNeighbors(): array
+    {
+        $details = (new \App\Actions\FetchCountryDetails)->execute($this->Code);
+
+        return $details['borders'] ?? [];
+    }
+
+    /**
+     * Get timezones from REST Countries API
+     *
+     * @return array<int, string>
+     */
+    public function getTimezones(): array
+    {
+        $details = (new \App\Actions\FetchCountryDetails)->execute($this->Code);
+
+        return $details['timezones'] ?? [];
+    }
+
+    /**
+     * Get primary timezone (first timezone if multiple exist)
+     */
+    public function getPrimaryTimezone(): ?string
+    {
+        $timezones = $this->getTimezones();
+
+        return ! empty($timezones) ? $timezones[0] : null;
     }
 }
