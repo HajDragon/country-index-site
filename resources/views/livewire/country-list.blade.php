@@ -1,12 +1,12 @@
 <div>
     {{-- Search and Sort --}}
     <div class="mb-6 flex gap-4">
-        <div class="flex-1">
+        <div class="flex-1 gradient-border-input dark:gradient-border-input-dark  rounded-full">
             <flux:input
                 wire:model.live.debounce.300ms="search"
                 type="text"
                 placeholder="Search countries by name, region, or capital..."
-                class="w-full"
+                class="w-full rounded-full bg-white dark:bg-gray-900 focus:!ring-0 focus:!outline-none overflow-hidden"
             />
         </div>
         <div class="w-64">

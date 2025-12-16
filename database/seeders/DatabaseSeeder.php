@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(WorldDatabaseSeeder::class);
+        $this->call(CountryCoordinatesSeeder::class);
         // User::factory(10)->create();
 
         User::firstOrCreate(

@@ -74,7 +74,7 @@ new class extends Component {
         <div class="mb-8 flex items-center justify-between">
             <div>
                 <flux:heading size="2xl" level="1">My Favorite Countries</flux:heading>
-                <p class="mt-2 text-gray-600 dark:text-gray-400">
+                <p class="mt-2 text-gray-600 dark:text-gray-400 ">
                     @if($this->favoriteCount > 0)
                         You have saved {{ $this->favoriteCount }} favorite {{ Str::plural('country', $this->favoriteCount) }}
                     @else
@@ -93,15 +93,15 @@ new class extends Component {
         @if($this->favoriteCount > 0)
         {{-- Search and Sort --}}
         <div class="mb-6 flex gap-4">
-            <div class="flex-1">
+            <div class="flex-1 gradient-border-input rounded-full ">
                 <flux:input
                     wire:model.live.debounce.300ms="search"
                     type="text"
                     placeholder="Search favorites..."
-                    class="w-full"
+                    class="w-full rounded-full bg-white dark:bg-gray-900 focus:!ring-0 focus:!outline-none overflow-hidden"
                 />
             </div>
-            <div class="w-64">
+            <div class="w-64 ">
                <flux:select wire:model.live="sortBy" class="w-full">
                     <option value="name_asc">Name (A-Z)</option>
                     <option value="name_desc">Name (Z-A)</option>
@@ -112,7 +112,7 @@ new class extends Component {
         </div>
 
         {{-- Favorites Grid --}}
-        <div class="mb-8 grid auto-rows-min gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div class="mb-8 grid auto-rows-min gap-4 md:grid-cols-3 lg:grid-cols-4 dark:text-white">
             @foreach($this->countries as $country)
                 <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
                     <a href="{{ route('country.view', $country->Code) }}" wire:navigate class="block h-full overflow-y-auto p-4 transition hover:bg-gray-50 dark:hover:bg-gray-800/50">

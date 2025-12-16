@@ -17,6 +17,14 @@
             </flux:button>
 
     <div class="grid gap-6 md:grid-cols-2">
+        {{-- Weather Card --}}
+        <livewire:weather-card
+            country-code="{{ $country->Code }}"
+            :latitude="$country->latitude"
+            :longitude="$country->longitude"
+            :country-name="$country->Name"
+        />
+
         {{-- General Information --}}
         <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
             <flux:heading size="lg" class="mb-4">General Information</flux:heading>
@@ -108,6 +116,28 @@
                     </div>
                 @empty
                     <p class="text-gray-500">No language data available</p>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Neighboring Countries --}}
+        <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+            <flux:heading size="lg" class="mb-4">Neighboring Countries</flux:heading>
+            <div class="max-h-48 space-y-2 overflow-y-auto">
+                @php
+                    $neighbors = $country->getNeighbors();
+                @endphp
+                @forelse($neighbors as $neighbor)
+                    <a href="{{ route('country.view', ['countryCode' => $neighbor['code']]) }}"
+                       class="flex items-center gap-3 rounded border border-gray-200 p-2 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                       wire:navigate>
+                        <img src="https://flagsapi.com/{{ \App\Models\Country::where('Code', $neighbor['code'])->value('Code2') }}/flat/24.png"
+                             class="h-4 w-6 rounded"
+                             alt="{{ $neighbor['name'] }} flag">
+                        <span class="font-medium text-sm">{{ $neighbor['name'] }}</span>
+                    </a>
+                @empty
+                    <p class="text-sm text-gray-500">No bordering countries or island nation</p>
                 @endforelse
             </div>
         </div>

@@ -28,6 +28,8 @@
     --color-accent-foreground: var(--color-white);
 }
 
+
+
 @layer theme {
     .dark {
         --color-accent: var(--color-white);
@@ -68,3 +70,36 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+@layer components {
+    .gradient-border-input {
+        position: relative;
+        border-radius: 9999px;
+    }
+
+    .gradient-border-input::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        padding: 2px;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #fbbf24, #f97316, #ef4444, #f97316, #fbbf24);
+        background-size: 200% 100%;
+        animation: gradient-shift 3s linear infinite;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+        transition: background 0.5s ease-in-out;
+    }
+
+    .dark .gradient-border-input::before {
+        background: linear-gradient(90deg, #9342d4, #4d1155, #514ba7, #9468bd, #b1286c);
+        background-size: 200% 100%;
+    }
+
+    @keyframes gradient-shift {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 200% 0%; }
+    }
+}
