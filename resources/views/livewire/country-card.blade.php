@@ -7,7 +7,7 @@
                 $timezone = $country->getPrimaryTimezone();
             @endphp
             @if($timezone)
-                <span class="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-medium text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                <span class="rounded-full mt-10 bg-indigo-100 px-2 py-0.5 text-[10px] font-medium text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
                     🕐 {{ $timezone }}
                 </span>
             @endif
