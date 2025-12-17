@@ -4,11 +4,11 @@
         <div class="mb-2 flex items-center justify-between">
             <img src="https://flagsapi.com/{{ $country->Code2 }}/flat/64.png" alt="{{ $country->Name }} flag" class="h-12 w-18">
             @php
-                $timezone = $country->getPrimaryTimezone();
+                $currentTime = $country->getCurrentTime();
             @endphp
-            @if($timezone)
+            @if($currentTime)
                 <span class="rounded-full mt-10 bg-indigo-100 px-2 py-0.5 text-[10px] font-medium text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
-                    🕐 {{ $timezone }}
+                    🕐 {{ $currentTime }}
                 </span>
             @endif
         </div>

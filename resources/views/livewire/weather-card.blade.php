@@ -1,10 +1,29 @@
 <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-    <div class="mb-4 flex items-center justify-between">
-        <flux:heading size="lg">Current Weather in {{ $countryCapital ?: ($countryName ?: ($countryCode ?: 'this location')) }}</flux:heading>
+    <div class="mb-4">
+        <flux:heading size="lg" class="mb-2">Current Weather in {{ $countryCapital ?: ($countryName ?: ($countryCode ?: 'this location')) }}</flux:heading>
         @if($timezone)
-            <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
-                🕐 {{ $timezone }}
-            </span>
+            @php
+                try {
+                    if (preg_match('/UTC([+-]\d{2}:\d{2})/', $timezone, $matches)) {
+                        $offset = $matches[1];
+                        $hours = (int) substr($offset, 0, 3);
+                        $minutes = (int) substr($offset, 4, 2) * (substr($offset, 0, 1) === '-' ? -1 : 1);
+                        $currentTime = \Illuminate\Support\Carbon::now('UTC')->addHours($hours)->addMinutes($minutes)->format('g:i A');
+                    } else {
+                        $currentTime = \Illuminate\Support\Carbon::now($timezone)->format('g:i A');
+                    }
+                } catch (\Exception $e) {
+                    $currentTime = null;
+                }
+            @endphp
+            @if($currentTime)
+                <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                    <span class="rounded-full bg-indigo-100 px-2 py-0.5 font-medium text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
+                        🕐 {{ $currentTime }}
+                    </span>
+                    <span class="text-gray-500">{{ $timezone }}</span>
+                </div>
+            @endif
         @endif
     </div>
 

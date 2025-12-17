@@ -11,6 +11,18 @@ use Illuminate\Support\Facades\Log;
 class FetchCountryDetails
 {
     /**
+     * Mapping of database country codes to REST Countries API codes
+     * This handles cases where our database uses different codes than the ISO 3166-1 alpha-3 standard
+     */
+    private const CODE_MAPPING = [
+        'ROM' => 'ROU', // Romania
+        'YUG' => 'SRB', // Yugoslavia -> Serbia (database is outdated)
+        'TMP' => 'TLS', // East Timor -> Timor-Leste (TMP is obsolete code)
+        'ZAR' => 'COD', // Zaire -> Democratic Republic of the Congo (ZAR is obsolete)
+        // Add more mappings here as needed
+    ];
+
+    /**
      * Fetch country details including borders and timezone from REST Countries API
      *
      * @return array{
@@ -20,15 +32,18 @@ class FetchCountryDetails
      */
     public function execute(string $countryCode): ?array
     {
+        // Map database code to REST Countries API code if needed
+        $apiCode = self::CODE_MAPPING[$countryCode] ?? $countryCode;
+
         $cacheKey = 'country.details.'.$countryCode;
 
         try {
-            return Cache::remember($cacheKey, 86400, function () use ($countryCode) {
+            return Cache::remember($cacheKey, 86400, function () use ($apiCode, $countryCode) {
                 $response = Http::withOptions([
                     'verify' => config('app.env') === 'production',
                 ])
                     ->timeout(10)
-                    ->get('https://restcountries.com/v3.1/alpha/'.$countryCode, [
+                    ->get('https://restcountries.com/v3.1/alpha/'.$apiCode, [
                         'fields' => 'borders,timezones,cca3',
                     ]);
 
@@ -64,9 +79,16 @@ class FetchCountryDetails
 
                     if ($bordersResponse->successful()) {
                         $borderCountries = $bordersResponse->json();
+                        // Create reverse mapping for API codes back to database codes
+                        $reverseMapping = array_flip(self::CODE_MAPPING);
+
                         foreach ($borderCountries as $borderCountry) {
+                            $apiCode = (string) ($borderCountry['cca3'] ?? '');
+                            // Convert API code back to database code if mapping exists
+                            $dbCode = $reverseMapping[$apiCode] ?? $apiCode;
+
                             $borders[] = [
-                                'code' => (string) ($borderCountry['cca3'] ?? ''),
+                                'code' => $dbCode,
                                 'name' => (string) ($borderCountry['name']['common'] ?? ''),
                             ];
                         }
