@@ -123,4 +123,30 @@ class Country extends Model
 
         return ! empty($timezones) ? $timezones[0] : null;
     }
+
+    /**
+     * Get current time in country's timezone formatted as 12-hour AM/PM
+     */
+    public function getCurrentTime(): ?string
+    {
+        $timezone = $this->getPrimaryTimezone();
+
+        if (! $timezone) {
+            return null;
+        }
+
+        try {
+            // Parse UTC offset format (e.g., UTC+01:00, UTC-05:00)
+            if (preg_match('/UTC([+-]\d{2}:\d{2})/', $timezone, $matches)) {
+                $offset = $matches[1];
+
+                return \Illuminate\Support\Carbon::now('UTC')->addHours((int) substr($offset, 0, 3))->addMinutes((int) substr($offset, 4, 2) * (substr($offset, 0, 1) === '-' ? -1 : 1))->format('g:i A');
+            }
+
+            // Try as IANA timezone
+            return \Illuminate\Support\Carbon::now($timezone)->format('g:i A');
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }
