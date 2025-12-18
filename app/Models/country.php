@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class Country extends Model
 {
     /** @use HasFactory<\Database\Factories\CountryFactory> */
-    use HasFactory, Searchable;
+    use HasFactory, HasSEO, Searchable;
 
     protected $table = 'country';
 
@@ -122,5 +124,32 @@ class Country extends Model
         $timezones = $this->getTimezones();
 
         return ! empty($timezones) ? $timezones[0] : null;
+    }
+
+    /**
+     * Provide dynamic SEO data for this country.
+     */
+    public function getDynamicSEOData(): SEOData
+    {
+        $seo = new SEOData;
+
+        $seo->title = $this->Name;
+        $seo->openGraphTitle = $this->Name;
+        $seo->description = trim(sprintf(
+            '%s in %s, %s. Population %s. Capital %s.',
+            $this->Name,
+            $this->Region,
+            $this->Continent,
+            number_format((int) $this->Population),
+            $this->capitalCity?->Name ?? 'N/A'
+        ));
+
+        $seo->url = route('country.view', ['countryCode' => $this->Code]);
+        $seo->site_name = config('app.name');
+        $seo->type = 'website';
+        $seo->locale = app()->getLocale();
+        $seo->enableTitleSuffix = true;
+
+        return $seo;
     }
 }

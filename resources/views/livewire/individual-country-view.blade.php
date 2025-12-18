@@ -1,3 +1,7 @@
+@section('seo')
+    {!! seo()->for($country) !!}
+@endsection
+
 <div class="mx-auto max-w-5xl">
     {{-- Country Header with Flag --}}
     <div class="mb-8 flex items-center justify-between gap-6">
@@ -12,7 +16,7 @@
             <livewire:actions.dark-mode-toggle />
         </div>
     </div>
-     <flux:button variant="ghost" size="sm" icon="arrow-left" onclick="window.location='{{ route('home') }}'">
+<flux:button variant="ghost" size="sm" icon="arrow-left" onclick="window.location='{{ route('home') }}'">
                 Back
             </flux:button>
 
@@ -145,8 +149,12 @@
 
     {{-- Cities Section --}}
     <div class="mt-6 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-        <flux:heading size="lg" class="mb-4">Cities ({{ $cities->total() }})</flux:heading>
-        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="mb-4 flex items-center justify-between">
+            <flux:heading size="lg">Cities ({{ $cities->total() }})</flux:heading>
+            <x-loading-spinner target="nextPage,previousPage,gotoPage" text="Loading..." class="ml-2" />
+        </div>
+
+        <div wire:loading.remove wire:target="nextPage,previousPage,gotoPage" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             @forelse($cities as $city)
                 <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50">
                     <div class="font-semibold">{{ $city->Name }}</div>
@@ -158,6 +166,17 @@
             @endforelse
         </div>
 
+        {{-- Loading skeleton for cities --}}
+        <div wire:loading wire:target="nextPage,previousPage,gotoPage" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            @for ($i = 0; $i < 6; $i++)
+                <div class="animate-pulse rounded-lg border border-gray-200 bg-gray-100 p-3 dark:border-gray-700 dark:bg-gray-800">
+                    <div class="mb-2 h-4 w-24 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                    <div class="mb-1 h-3 w-32 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                    <div class="h-2 w-16 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                </div>
+            @endfor
+        </div>
+
         @if($cities->hasPages())
             <div class="mt-8 flex flex-col items-center gap-3">
                 <nav class="flex items-center gap-1">
@@ -165,7 +184,11 @@
                     @if ($cities->onFirstPage())
                         <span class="px-3 py-2 text-gray-400 dark:text-gray-600">Previous</span>
                     @else
-                        <a wire:click="previousPage" class="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded">Previous</a>
+                        <a
+                            wire:click="previousPage"
+                            wire:loading.attr="disabled"
+                            class="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >Previous</a>
                     @endif
 
                     {{-- Page Numbers --}}
@@ -173,13 +196,21 @@
                         @if ($page == $cities->currentPage())
                             <span class="px-3 py-2 bg-blue-500 text-white rounded">{{ $page }}</span>
                         @else
-                            <a wire:click="gotoPage({{ $page }})" class="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded">{{ $page }}</a>
+                            <a
+                                wire:click="gotoPage({{ $page }})"
+                                wire:loading.attr="disabled"
+                                class="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                            >{{ $page }}</a>
                         @endif
                     @endforeach
 
                     {{-- Next Button --}}
                     @if ($cities->hasMorePages())
-                        <a wire:click="nextPage" class="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded">Next</a>
+                        <a
+                            wire:click="nextPage"
+                            wire:loading.attr="disabled"
+                            class="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        >Next</a>
                     @else
                         <span class="px-3 py-2 text-gray-400 dark:text-gray-600">Next</span>
                     @endif

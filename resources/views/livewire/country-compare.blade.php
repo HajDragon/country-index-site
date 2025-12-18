@@ -3,7 +3,6 @@
         <div class="flex-1">
             <flux:button variant="ghost" size="sm" icon="arrow-left" onclick="window.location.href='{{ route('home') }}'">
                 Back
-
             </flux:button>
             <flux:heading size="xl">Compare Countries</flux:heading>
             <flux:subheading>Select 2–3 countries to compare side-by-side.</flux:subheading>

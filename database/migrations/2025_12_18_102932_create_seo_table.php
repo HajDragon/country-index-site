@@ -11,7 +11,10 @@ return new class extends Migration
         Schema::create('seo', function (Blueprint $table) {
             $table->id();
 
-            $table->morphs('model');
+            // Use string morph keys to support models with string primary keys (e.g., Country.Code)
+            $table->string('model_type');
+            $table->string('model_id');
+            $table->index(['model_type', 'model_id']);
 
             $table->longText('description')->nullable();
             $table->string('title')->nullable();

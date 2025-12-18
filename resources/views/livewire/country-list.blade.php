@@ -25,7 +25,7 @@
 
     {{-- Advanced Filters --}}
     @if($showFilters)
-    <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+    <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
         <div class="mb-4 flex items-center justify-between">
             <flux:heading size="lg" level="3">Advanced Filters</flux:heading>
             <flux:button wire:click="clearFilters" variant="ghost" size="sm">Clear All</flux:button>
