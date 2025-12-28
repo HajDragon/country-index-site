@@ -90,8 +90,8 @@
                         <div class="flex justify-between"><span class="text-gray-500">GNP</span><span class="font-medium">{{ $country->GNP ? '$'.number_format($country->GNP) : 'N/A' }}</span></div>
                         <div class="flex justify-between"><span class="text-gray-500">Cities</span><span class="font-medium">{{ $country->cities_count }}</span></div>
                         <div class="flex justify-between">
-                            <span class="text-gray-500">Timezone</span>
-                            <span class="font-medium text-xs">{{ $country->getPrimaryTimezone() ?? 'N/A' }}</span>
+                            <span class="text-gray-500">Local Time</span>
+                            <span class="font-medium text-xs">{{ $country->getCurrentTime() ?? 'N/A' }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Neighbors</span>

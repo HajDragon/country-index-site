@@ -130,12 +130,21 @@
             <div class="max-h-48 space-y-2 overflow-y-auto">
                 @php
                     $neighbors = $country->getNeighbors();
+                    // Fetch all neighbor countries in one query for efficiency
+                    $neighborCodes = array_column($neighbors, 'code');
+                    $neighborCountries = \App\Models\Country::whereIn('Code', $neighborCodes)
+                        ->get()
+                        ->keyBy('Code');
                 @endphp
                 @forelse($neighbors as $neighbor)
+                    @php
+                        $neighborCountry = $neighborCountries->get($neighbor['code']);
+                        $code2 = $neighborCountry?->Code2 ?? strtoupper(substr($neighbor['code'], 0, 2));
+                    @endphp
                     <a href="{{ route('country.view', ['countryCode' => $neighbor['code']]) }}"
                        class="flex items-center gap-3 rounded border border-gray-200 p-2 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                        wire:navigate>
-                        <img src="https://flagsapi.com/{{ \App\Models\Country::where('Code', $neighbor['code'])->value('Code2') }}/flat/24.png"
+                        <img src="https://flagsapi.com/{{ $code2 }}/flat/24.png"
                              class="h-4 w-6 rounded"
                              alt="{{ $neighbor['name'] }} flag">
                         <span class="font-medium text-sm">{{ $neighbor['name'] }}</span>
