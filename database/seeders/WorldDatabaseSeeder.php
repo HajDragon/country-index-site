@@ -47,6 +47,14 @@ class WorldDatabaseSeeder extends Seeder
         preg_match_all("/INSERT INTO `{$tableName}` VALUES \([^;]+;/", $sql, $matches);
 
         foreach ($matches[0] as $insert) {
+            if ($tableName === 'country') {
+                $insert = str_replace(
+                    'INSERT INTO `country` VALUES',
+                    'INSERT INTO `country` (`Code`,`Name`,`Continent`,`Region`,`SurfaceArea`,`IndepYear`,`Population`,`LifeExpectancy`,`GNP`,`GNPOld`,`LocalName`,`GovernmentForm`,`HeadOfState`,`Capital`,`Code2`) VALUES',
+                    $insert
+                );
+            }
+
             DB::unprepared($insert);
         }
     }
