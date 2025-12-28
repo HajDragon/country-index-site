@@ -44,6 +44,10 @@ class CountryCount extends StatsOverviewWidget
                 ->description('Average surface area of countries (sq km)')
                 ->icon('heroicon-o-globe-europe-africa'),
 
+            Stat::make('Avg. GNP', $this->formatFloat((float) Country::avg('GNP'), 2))
+                ->description('Average GNP of countries')
+                ->icon('heroicon-o-currency-dollar'),
+
         ];
     }
 

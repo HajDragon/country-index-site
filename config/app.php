@@ -13,11 +13,11 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Country Explorer'),
 
     /*
     |--------------------------------------------------------------------------
-    | Application Environment
+    | Application Environmentc
     |--------------------------------------------------------------------------
     |
     | This value determines the "environment" your application is currently
