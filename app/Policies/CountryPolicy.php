@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\country;
+use App\Models\Country;
 use App\Models\User;
 
 class CountryPolicy
@@ -12,15 +12,15 @@ class CountryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, country $country): bool
+    public function view(User $user, Country $country): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -28,38 +28,38 @@ class CountryPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, country $country): bool
+    public function update(User $user, Country $country): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, country $country): bool
+    public function delete(User $user, Country $country): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, country $country): bool
+    public function restore(User $user, Country $country): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, country $country): bool
+    public function forceDelete(User $user, Country $country): bool
     {
-        return false;
+        return true;
     }
 }
