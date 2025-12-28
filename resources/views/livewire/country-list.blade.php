@@ -1,13 +1,29 @@
-<div>
+<div class="relative">
+    {{-- Scoped loading overlay - only for search, pagination, exports, and filters --}}
+    <div
+        wire:loading.delay
+        wire:target="performSearch,previousPage,nextPage,gotoPage,exportCsv,exportPdf,clearFilters,updatedSortBy,updatedSelectedContinents,updatedSelectedRegions,updatedPopulationMin,updatedPopulationMax,updatedLifeExpectancyMin,updatedLifeExpectancyMax,updatedShowFavoritesOnly"
+        class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm rounded-lg"
+    >
+        <div class="flex flex-col items-center pt-100 gap-3">
+        <div class="h-12 w-12 animate-spin rounded-full border-4 border-white border-t-blue-500"></div>
+        <p class="text-white font-medium text-lg">Loading...</p>
+        </div>
+    </div>
+
     {{-- Search and Sort --}}
     <div class="mb-6 flex gap-4">
-        <div class="flex-1 gradient-border-input dark:gradient-border-input-dark  rounded-full">
+        <div class="flex-1 gradient-border-input dark:gradient-border-input-dark rounded-full flex">
             <flux:input
-                wire:model.live.debounce.300ms="search"
+                wire:model="searchTerm"
+                wire:keydown.enter="performSearch"
                 type="text"
                 placeholder="Search countries by name, region, or capital..."
-                class="w-full rounded-full bg-white dark:bg-gray-900 focus:!ring-0 focus:!outline-none overflow-hidden"
+                class="w-full rounded-l-full bg-white dark:bg-gray-900 focus:!ring-0 focus:!outline-none overflow-hidden border-r-0"
             />
+            <flux:button wire:click="performSearch" class="rounded-r-full rounded-l-none" icon="magnifying-glass">
+                Search
+            </flux:button>
         </div>
         <div class="w-64">
            <flux:select wire:model.live="sortBy" class="w-full">
@@ -25,7 +41,7 @@
 
     {{-- Advanced Filters --}}
     @if($showFilters)
-    <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+    <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
         <div class="mb-4 flex items-center justify-between">
             <flux:heading size="lg" level="3">Advanced Filters</flux:heading>
             <flux:button wire:click="clearFilters" variant="ghost" size="sm">Clear All</flux:button>
@@ -182,4 +198,5 @@
             Showing {{ $countries->firstItem() }} to {{ $countries->lastItem() }} of {{ $countries->total() }} results
         </p>
     </div>
+</div>
 </div>

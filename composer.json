@@ -3,14 +3,12 @@
     "name": "laravel/livewire-starter-kit",
     "type": "project",
     "description": "The official Laravel starter kit for Livewire.",
-    "keywords": [
-        "laravel",
-        "framework"
-    ],
+    "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
+        "filament/filament": "4.x-dev",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/scout": "^10.22",
@@ -18,7 +16,8 @@
         "livewire/flux": "^2.9.0",
         "livewire/volt": "^1.7.0",
         "maatwebsite/excel": "^3.1",
-        "meilisearch/meilisearch-php": "^1.16"
+        "meilisearch/meilisearch-php": "^1.16",
+        "ralphjsmit/laravel-seo": "^1.7"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -62,7 +61,8 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
@@ -94,6 +94,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

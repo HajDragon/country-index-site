@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class Country extends Model
 {
     /** @use HasFactory<\Database\Factories\CountryFactory> */
-    use HasFactory, Searchable;
+    use HasFactory, HasSEO, Searchable;
 
     protected $table = 'country';
 
@@ -125,6 +127,33 @@ class Country extends Model
     }
 
     /**
+     * Provide dynamic SEO data for this country.
+     */
+    public function getDynamicSEOData(): SEOData
+    {
+        $seo = new SEOData;
+
+        $seo->title = $this->Name;
+        $seo->openGraphTitle = $this->Name;
+        $seo->description = trim(sprintf(
+            '%s in %s, %s. Population %s. Capital %s.',
+            $this->Name,
+            $this->Region,
+            $this->Continent,
+            number_format((int) $this->Population),
+            $this->capitalCity?->Name ?? 'N/A'
+        ));
+
+        $seo->url = route('country.view', ['countryCode' => $this->Code]);
+        $seo->site_name = config('app.name');
+        $seo->type = 'website';
+        $seo->locale = app()->getLocale();
+        $seo->enableTitleSuffix = true;
+
+        return $seo;
+    }
+
+    /**
      * Get current time in country's timezone formatted as 12-hour AM/PM
      */
     public function getCurrentTime(): ?string
@@ -140,12 +169,15 @@ class Country extends Model
             if (preg_match('/UTC([+-]\d{2}:\d{2})/', $timezone, $matches)) {
                 $offset = $matches[1];
 
-                return \Illuminate\Support\Carbon::now('UTC')->addHours((int) substr($offset, 0, 3))->addMinutes((int) substr($offset, 4, 2) * (substr($offset, 0, 1) === '-' ? -1 : 1))->format('g:i A');
+                return \Illuminate\Support\Carbon::now('UTC')
+                    ->addHours((int) substr($offset, 0, 3))
+                    ->addMinutes((int) substr($offset, 4, 2) * (substr($offset, 0, 1) === '-' ? -1 : 1))
+                    ->format('g:i A');
             }
 
             // Try as IANA timezone
             return \Illuminate\Support\Carbon::now($timezone)->format('g:i A');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }

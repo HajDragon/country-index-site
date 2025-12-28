@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(WorldDatabaseSeeder::class);
         $this->call(CountryCoordinatesSeeder::class);
-        // User::factory(10)->create();
+        User::factory(20)->create();
 
         User::firstOrCreate(
             ['email' => 'test@example.com'],

@@ -16,6 +16,8 @@ class CountryList extends Component
 
     public $search = '';
 
+    public $searchTerm = '';
+
     public $sortBy = 'name_asc';
 
     public $showFavoritesOnly = false;
@@ -39,6 +41,12 @@ class CountryList extends Component
     {
         // Set default population max to 2 billion
         $this->populationMax = 2000000000;
+    }
+
+    public function performSearch(): void
+    {
+        $this->search = $this->searchTerm;
+        $this->resetPage();
     }
 
     public function updatedSearch(): void
@@ -153,7 +161,7 @@ class CountryList extends Component
     protected function applySorting($query)
     {
         return match ($this->sortBy) {
-            'Continent' => $query->orderBy('Region', 'asc')->orderBy('Name', 'asc'),
+            'continent' => $query->orderBy('Continent', 'asc')->orderBy('Name', 'asc'),
             'name_asc' => $query->orderBy('Name', 'asc'),
             'name_desc' => $query->orderBy('Name', 'desc'),
             'population_desc' => $query->orderBy('Population', 'desc'),
