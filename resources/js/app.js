@@ -8,6 +8,10 @@ document.addEventListener('livewire:init', function () {
     // Track loading state for page navigation
     let isLoading = false;
 
+    if (document.body?.dataset?.globalOverlay === 'disabled') {
+        return;
+    }
+
     // Show loading bar on Livewire requests
     Livewire.hook('request', ({ succeed, fail }) => {
         isLoading = true;

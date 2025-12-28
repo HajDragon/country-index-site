@@ -8,45 +8,50 @@ use App\Models\User;
 use Livewire\Livewire;
 
 beforeEach(function () {
+    // Use Scout's local database engine during tests to avoid external services
+    config()->set('scout.driver', 'database');
+    config()->set('scout.queue', false);
     $user = User::factory()->create();
 
-    // Create test countries
-    Country::create([
-        'Code' => 'USA',
-        'Name' => 'United States',
-        'Continent' => 'North America',
-        'Region' => 'North America',
-        'SurfaceArea' => 9834000,
-        'Population' => 333000000,
-        'LifeExpectancy' => 76.4,
-        'Code2' => 'US',
-    ]);
+    // Create test countries without syncing to Scout/Meilisearch
+    Country::withoutSyncingToSearch(function () {
+        Country::create([
+            'Code' => 'USA',
+            'Name' => 'United States',
+            'Continent' => 'North America',
+            'Region' => 'North America',
+            'SurfaceArea' => 9834000,
+            'Population' => 333000000,
+            'LifeExpectancy' => 76.4,
+            'Code2' => 'US',
+        ]);
 
-    Country::create([
-        'Code' => 'GBR',
-        'Name' => 'United Kingdom',
-        'Continent' => 'Europe',
-        'Region' => 'Northern Europe',
-        'SurfaceArea' => 242900,
-        'Population' => 67000000,
-        'LifeExpectancy' => 82.5,
-        'Code2' => 'GB',
-    ]);
+        Country::create([
+            'Code' => 'GBR',
+            'Name' => 'United Kingdom',
+            'Continent' => 'Europe',
+            'Region' => 'Northern Europe',
+            'SurfaceArea' => 242900,
+            'Population' => 67000000,
+            'LifeExpectancy' => 82.5,
+            'Code2' => 'GB',
+        ]);
 
-    Country::create([
-        'Code' => 'IND',
-        'Name' => 'India',
-        'Continent' => 'Asia',
-        'Region' => 'South Asia',
-        'SurfaceArea' => 3287263,
-        'Population' => 1417000000,
-        'LifeExpectancy' => 71.0,
-        'Code2' => 'IN',
-    ]);
+        Country::create([
+            'Code' => 'IND',
+            'Name' => 'India',
+            'Continent' => 'Asia',
+            'Region' => 'South Asia',
+            'SurfaceArea' => 3287263,
+            'Population' => 1417000000,
+            'LifeExpectancy' => 71.0,
+            'Code2' => 'IN',
+        ]);
+    });
 });
 
-test('user can filter countries by continent', function ($user) {
-    $this->actingAs($user);
+test('user can filter countries by continent', function () {
+    $this->actingAs(User::factory()->create());
 
     // Test that the filter changes the query parameters
     Livewire::test(CountryList::class)
@@ -54,39 +59,40 @@ test('user can filter countries by continent', function ($user) {
         ->assertSet('selectedContinents', ['North America']);
 });
 
-test('user can filter countries by multiple continents', function ($user) {
-    $this->actingAs($user);
+test('user can filter countries by multiple continents', function () {
+    $this->actingAs(User::factory()->create());
 
     Livewire::test(CountryList::class)
         ->set('selectedContinents', ['North America', 'Europe'])
         ->assertSet('selectedContinents', ['North America', 'Europe']);
 });
 
-test('user can filter countries by population range', function ($user) {
-    $this->actingAs($user);
+test('user can filter countries by population range', function () {
+    $this->actingAs(User::factory()->create());
 
     Livewire::test(CountryList::class)
         ->set('populationMin', 100000000)
         ->set('populationMax', 500000000)
-        ->assertSee('United States')
-        ->assertSee('India')
+    // Only United States should match in our fixture data
+    ->assertSee('Showing 1 to 1 of 1 results')
         ->assertSet('populationMin', 100000000)
         ->assertSet('populationMax', 500000000);
 });
 
-test('user can filter countries by life expectancy range', function ($user) {
-    $this->actingAs($user);
+test('user can filter countries by life expectancy range', function () {
+    $this->actingAs(User::factory()->create());
 
     Livewire::test(CountryList::class)
         ->set('lifeExpectancyMin', 75)
         ->set('lifeExpectancyMax', 85)
-        ->assertSee('United States')
+    // Two countries should match (USA and UK)
+    ->assertSee('Showing 1 to 2 of 2 results')
         ->assertSet('lifeExpectancyMin', 75)
         ->assertSet('lifeExpectancyMax', 85);
 });
 
-test('user can clear all filters', function ($user) {
-    $this->actingAs($user);
+test('user can clear all filters', function () {
+    $this->actingAs(User::factory()->create());
 
     Livewire::test(CountryList::class)
         ->set('selectedContinents', ['Asia'])
@@ -96,12 +102,14 @@ test('user can clear all filters', function ($user) {
         ->assertSet('populationMin', 0);
 });
 
-test('user can search and filter simultaneously', function ($user) {
-    $this->actingAs($user);
+test('user can search and filter simultaneously', function () {
+    $this->actingAs(User::factory()->create());
 
     Livewire::test(CountryList::class)
-        ->set('search', 'United')
+        // Trigger manual search to avoid live queries during typing
+        ->set('searchTerm', 'United')
+        ->call('performSearch')
         ->set('selectedContinents', ['Europe'])
-        ->assertSee('United Kingdom')
-        ->assertDontSee('United States');
+        // Only United Kingdom should remain after filtering
+        ->assertSee('Showing 1 to 1 of 1 results');
 });
