@@ -1,9 +1,15 @@
 <div>
     <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-end">
         <div class="flex-1">
-            <flux:button variant="ghost" size="sm" icon="arrow-left" onclick="window.location.href='{{ route('home') }}'">
-                Back
-            </flux:button>
+        <flux:button variant="ghost" icon="arrow-left" icon:variant="outline" size="sm"
+           wire:click="goHome"
+            class="rounded bg-blue-600 px-2 py-1 text-xs font-semibold text-white shadow hover:bg-blue-700"
+            onclick="event.stopPropagation();">
+            <div wire:loading.remove>Back</div>
+            <div wire:loading>Going back...</div>
+
+        </flux:button>
+
             <flux:heading size="xl">Compare Countries</flux:heading>
             <flux:subheading>Select 2–3 countries to compare side-by-side.</flux:subheading>
         </div>

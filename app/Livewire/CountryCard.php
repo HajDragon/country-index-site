@@ -59,4 +59,9 @@ class CountryCard extends Component
     {
         return view('livewire.country-card');
     }
+
+    public function goCompare()
+    {
+        $this->redirect(route('countries.compare', ['codes' => $this->countryCode]));
+    }
 }

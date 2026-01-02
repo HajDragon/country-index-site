@@ -3,12 +3,14 @@
 namespace App\Livewire;
 
 use App\Models\Country;
+use App\Traits\HasHomeNavigation;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class CountryCompare extends Component
 {
+    use HasHomeNavigation;
     #[Url(as: 'codes')]
     public string $codesCsv = '';
 

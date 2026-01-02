@@ -35,7 +35,10 @@
            </flux:select>
         </div>
         <flux:button wire:click="$toggle('showFilters')" variant="ghost" size="sm">
-            🔧 {{ $showFilters ? 'Hide' : 'Show' }} Filters
+            <div wire:loading.remove>
+                {{ $showFilters ? 'Hide Filters' : '🔧Show Filters' }}
+            </div>
+            <div wire:loading>Loading Filters...</div>
         </flux:button>
     </div>
 

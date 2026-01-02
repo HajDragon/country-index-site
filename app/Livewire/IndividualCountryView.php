@@ -5,9 +5,11 @@ namespace App\Livewire;
 use App\Models\Country;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Traits\HasHomeNavigation;
 
 class IndividualCountryView extends Component
 {
+    use HasHomeNavigation;
     use WithPagination;
 
     public string $countryCode;
