@@ -4,9 +4,11 @@ use Livewire\Volt\Component;
 use Livewire\WithPagination;
 use App\Models\Country;
 use Illuminate\Support\Facades\Auth;
+use App\traits\HasHomeNavigation;
 
 new class extends Component {
     use WithPagination;
+    use HasHomeNavigation;
 
     public $search = '';
     public $sortBy = 'name_asc';
@@ -84,9 +86,14 @@ new class extends Component {
             </div>
             <div class="flex items-center gap-3">
                 <livewire:actions.dark-mode-toggle />
-                <a href="{{ route('home') }}" wire:navigate class="text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                    ← Back to Countries
-                </a>
+                <flux:button icon="arrow-left" variant="ghost"
+                    wire:click="goHome"
+                    icon:variant="outline" size="sm"
+                    onclick="event.stopPropagation();">
+                    <div wire:loading.remove>Back to Countries</div>
+                    <div wire:loading>going Back...</div>
+
+                </flux:button>
             </div>
         </div>
 

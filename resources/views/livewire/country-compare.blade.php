@@ -7,7 +7,6 @@
             onclick="event.stopPropagation();">
             <div wire:loading.remove>Back</div>
             <div wire:loading>Going back...</div>
-
         </flux:button>
 
             <flux:heading size="xl">Compare Countries</flux:heading>
