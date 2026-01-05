@@ -26,6 +26,7 @@ class User extends Authenticatable
         'origin',
         'password',
         'is_admin',
+        'profile_image',
     ];
 
     /**
