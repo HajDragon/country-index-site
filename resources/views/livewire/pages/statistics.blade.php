@@ -2,8 +2,12 @@
 
 use Livewire\Volt\Component;
 use App\Models\Country;
+use Illuminate\Support\Facades\Redirect;
+use App\Traits\HasHomeNavigation;
 
 new class extends Component {
+    use HasHomeNavigation;
+
     #[\Livewire\Attributes\Computed]
     public function statistics()
     {
@@ -56,7 +60,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen bg-white dark:bg-gray-900">
+<div class="min-h-screen bg-white dark:bg-gray-900 dark:text-white ">
     <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {{-- Header --}}
         <div class="mb-8 flex items-center justify-between">
@@ -66,9 +70,14 @@ new class extends Component {
             </div>
             <div class="flex items-center gap-3">
                 <livewire:actions.dark-mode-toggle />
-                <a href="{{ route('home') }}" wire:navigate class="text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                    ← Back to Countries
-                </a>
+                <flux:button variant="ghost" icon="arrow-left" icon:variant="outline" size="sm"
+                wire:click="goHome"
+                class="rounded bg-blue-600 px-2 py-1 text-xs font-semibold text-white shadow hover:bg-blue-700"
+                onclick="event.stopPropagation();">
+                <div wire:loading.remove>Back</div>
+            <div wire:loading>Going back...</div>
+
+        </flux:button>
             </div>
         </div>
 

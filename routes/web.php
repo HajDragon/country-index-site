@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -43,6 +44,10 @@ Route::middleware(['auth'])->group(function () {
     // Statistics and Favorites pages
     Volt::route('stats', 'pages.statistics')->name('stats');
     Volt::route('favorites', 'pages.favorites')->name('favorites');
+
+
+    //profile upload route
+    Route::post('profile/upload', [ProfileController::class, 'upload'])->name('profile.upload');
 
     // Export routes
     Route::get('export/countries/csv', [CountryController::class, 'exportCsv'])->name('export.countries.csv');

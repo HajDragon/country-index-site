@@ -16,9 +16,13 @@
             <livewire:actions.dark-mode-toggle />
         </div>
     </div>
-<flux:button variant="ghost" size="sm" icon="arrow-left" onclick="window.location='{{ route('home') }}'">
-                Back
-            </flux:button>
+<flux:button variant="ghost" size="sm" icon="arrow-left"
+    onclick="wire.event.stopPropagation();"
+    wire:click="goHome">
+    <div wire:loading.remove>Back</div>
+    <div wire:loading>Going back...</div>
+
+    </flux:button>
 
     <div class="grid gap-6 md:grid-cols-2">
         {{-- Weather Card --}}

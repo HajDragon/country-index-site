@@ -35,24 +35,28 @@
         <button
             wire:click="toggleFavorite"
             wire:loading.attr="disabled"
+            wire:target="toggleFavorite"
             class="rounded bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-800 shadow hover:bg-gray-300 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             onclick="event.stopPropagation();"
             title="{{ $isFavorite ? 'Remove from favorites' : 'Add to favorites' }}"
         >
-            @if($isFavorite)
-                ♥
-            @else
-                ♡
-            @endif
+        @if (!$isFavorite)<div wire:loading.remove wire:target="toggleFavorite">♡</div>@endif
+       @if ($isFavorite) <div wire:loading wire:target="toggleFavorite">💔</div>@endif
+       @if (!$isFavorite) <div wire:loading wire:target="toggleFavorite">💞</div>@endif
+        @if ($isFavorite)
+            <div wire:loading.remove wire:target="toggleFavorite">♥</div>
+        @endif
+
         </button>
-        <a
-            href="{{ route('countries.compare', ['codes' => $country->Code]) }}"
-            wire:navigate
+        <flux:button variant="outline" size="sm"
+            wire:click="goCompare"
             class="rounded bg-blue-600 px-2 py-1 text-xs font-semibold text-white shadow hover:bg-blue-700"
             onclick="event.stopPropagation();"
         >
-            Compare
-        </a>
+            <div wire:loading.remove wire:target="goCompare">Compare</div>
+            <div wire:loading wire:target="goCompare">Comparing...</div>
+        </flux:button>
     </div>
     @endif
+
 </div>

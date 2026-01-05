@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
-
+use App\Traits\HasHomeNavigation;
 new class extends Component {
+    use HasHomeNavigation;
+
     public string $name = '';
     public string $email = '';
     public ?string $origin = null;
@@ -19,6 +21,7 @@ new class extends Component {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
         $this->origin = Auth::user()->origin;
+
     }
 
     /**
@@ -78,6 +81,30 @@ new class extends Component {
     @include('partials.settings-heading')
 
     <x-settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
+
+        @php
+            $uploadAction = \Illuminate\Support\Facades\Route::has('profile.upload')
+                ? route('profile.upload')
+                : url('profile/upload');
+        @endphp
+        <form action="{{ $uploadAction }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @if (auth()->user()->profile_image)
+                    <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile Image" width="150">
+            @else
+                    <img src="{{ asset('default-avatar.png') }}" alt="Default Image" width="150">
+            @endif
+
+            <div class=" text-white ">
+                <label class="text-white" for="profile_image">Choose Profile Image</label>
+                <input class="" type="file" name="profile_image" id="profile_image">
+            </div>
+
+            <flux:button variant="outline" type="submit" class="text-white">
+                <div wire:loading.remove wire:target="updateProfileInformation">Upload</div><div wire:loading wire:target="updateProfileInformation">Uploading...</div></div>
+            </flux:button>
+        </form>
+
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
             <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
 
@@ -117,6 +144,7 @@ new class extends Component {
                 </x-action-message>
             </div>
         </form>
+
 
         <livewire:settings.delete-user-form />
     </x-settings.layout>
