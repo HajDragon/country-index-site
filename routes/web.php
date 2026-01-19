@@ -44,9 +44,9 @@ Route::middleware(['auth'])->group(function () {
     // Statistics and Favorites pages
     Volt::route('stats', 'pages.statistics')->name('stats');
     Volt::route('favorites', 'pages.favorites')->name('favorites');
+    Volt::route('analytics', 'pages.analytics')->name('analytics');
 
-
-    //profile upload route
+    // profile upload route
     Route::post('profile/upload', [ProfileController::class, 'upload'])->name('profile.upload');
 
     // Export routes

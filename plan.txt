@@ -1,0 +1,138 @@
+Implementation Plan: Advanced Analytics Dashboard
+Overview
+Build an analytics dashboard that tracks user interactions with countries and displays meaningful insights using aggregated data.
+
+Phase 1: Data Collection Infrastructure
+1.1 Create Analytics Tracking Table
+Migration Structure:
+
+user_id (nullable for guest tracking)
+country_id
+interaction_type (enum: view, favorite, compare, search)
+session_id (for guest analytics)
+ip_address (optional, for geographic insights)
+user_agent (optional, for device insights)
+created_at
+1.2 Create CountryInteraction Model
+Relationships:
+
+belongsTo(User::class)
+belongsTo(Country::class)
+1.3 Create Tracking Middleware/Event System
+Option A: Middleware to track page views
+Option B: Event-based tracking for more granular control (recommended)
+
+Phase 2: Analytics Computation
+2.1 Create Analytics Service
+Methods to implement:
+
+getMostSearchedCountries(int $limit = 10, string $period = '30days')
+getTrendingCountries(int $limit = 10) - countries with increasing view velocity
+getMostComparedCountries(int $limit = 10)
+getRegionalInsights() - aggregated stats by continent/region
+getUserCountryVisits(User $user) - countries a user has interacted with
+getPopularComparisons(int $limit = 10) - most common country pairs
+2.2 Add Caching Layer
+Use Redis/Cache for expensive queries:
+
+Phase 3: Dashboard UI (Livewire Volt)
+3.1 Create Analytics Dashboard Page
+Dashboard Sections:
+
+Trending Countries Card
+
+Top 10 trending countries
+Percentage change indicator
+Mini sparkline charts (optional)
+Most Searched Card
+
+Top 10 most searched countries
+Search volume numbers
+Popular Comparisons Card
+
+Top country pairs being compared
+Comparison count
+Regional Insights Card
+
+Continent-level statistics
+Most popular region
+Average interactions per region
+User Statistics Section (authenticated users only)
+
+Countries visited/viewed by user
+User's favorite regions
+Personalized recommendations
+3.2 Add Interactive Heatmap (Optional Enhancement)
+Use a library like Chart.js or ApexCharts with a world map visualization:
+
+Color-coded by interaction volume
+Hover tooltips with stats
+Click to drill down into country details
+Phase 4: Filament Admin Analytics
+4.1 Create Admin Analytics Page
+Admin-only features:
+
+Detailed interaction logs
+Date range filters
+Export analytics data
+User behavior patterns
+Traffic sources
+4.2 Add Widgets to Admin Dashboard
+Phase 5: Performance Optimization
+5.1 Database Indexing
+Add indexes to country_interactions:
+
+index(['country_id', 'created_at'])
+index(['user_id', 'interaction_type'])
+index(['session_id'])
+5.2 Scheduled Aggregation Jobs
+Run hourly/daily to pre-compute expensive stats:
+
+Trending scores
+Regional aggregates
+Top searches
+Add to console.php:
+
+Phase 6: Testing
+6.1 Feature Tests
+Test scenarios:
+
+Analytics data is tracked correctly
+Dashboard displays accurate statistics
+Caching works properly
+Trending algorithm is accurate
+Regional insights aggregate correctly
+6.2 Browser Tests
+Test user interactions with the dashboard.
+
+Implementation Priority
+High Priority (MVP)
+✅ Country interaction tracking (views, searches)
+✅ Most searched countries
+✅ Basic analytics dashboard page
+✅ User statistics (countries visited)
+Medium Priority
+Trending countries algorithm
+Popular comparisons tracking
+Regional insights
+Admin analytics page
+Low Priority (Future Enhancement)
+Interactive heatmap visualization
+Advanced filtering/date ranges
+Export analytics
+Predictive insights (ML-based recommendations)
+Technical Considerations
+Privacy:
+
+Make analytics opt-in/out
+Anonymize IP addresses
+GDPR compliance for EU users
+Performance:
+
+Use queue workers for heavy aggregations
+Implement pagination for large datasets
+Add database read replicas if needed
+Scalability:
+
+Consider moving to ClickHouse or TimescaleDB for time-series data at scale
+Use CDN for static visualizations

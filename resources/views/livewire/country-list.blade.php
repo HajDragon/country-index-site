@@ -139,6 +139,7 @@
                     <flux:menu>
                         <flux:menu.item icon="star" href="/favorites">My Favorites</flux:menu.item>
                         <flux:menu.item icon="chart-bar" href="/stats">Statistics</flux:menu.item>
+                        <flux:menu.item icon="chart-pie" href="/analytics">Analytics</flux:menu.item>
                         <flux:menu.item icon="cog" href="/settings">Settings</flux:menu.item>
                         <flux:menu.separator />
                         <form method="POST" action="{{ route('logout') }}" class="w-full">

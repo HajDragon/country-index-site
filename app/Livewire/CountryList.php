@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Events\CountryInteracted;
 use App\Exports\CountriesExport;
 use App\Models\Country;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -47,6 +48,18 @@ class CountryList extends Component
     {
         $this->search = $this->searchTerm;
         $this->resetPage();
+
+        // Track search interaction
+        if (! empty($this->searchTerm)) {
+            // Get first matching country for tracking purposes
+            $country = Country::where('Name', 'like', "%{$this->searchTerm}%")
+                ->orWhere('Code', 'like', "%{$this->searchTerm}%")
+                ->first();
+
+            if ($country) {
+                CountryInteracted::dispatch($country, 'search', auth()->user());
+            }
+        }
     }
 
     public function updatedSearch(): void

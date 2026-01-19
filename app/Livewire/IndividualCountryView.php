@@ -2,10 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Events\CountryInteracted;
 use App\Models\Country;
+use App\Traits\HasHomeNavigation;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Traits\HasHomeNavigation;
 
 class IndividualCountryView extends Component
 {
@@ -22,6 +23,9 @@ class IndividualCountryView extends Component
         $this->country = Country::with(['capitalCity', 'languages'])
             ->where('Code', $countryCode)
             ->firstOrFail();
+
+        // Track country view
+        CountryInteracted::dispatch($this->country, 'view', auth()->user());
     }
 
     public function render()

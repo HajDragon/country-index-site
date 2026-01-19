@@ -1,5 +1,8 @@
 <?php
+
 use App\Http\Middleware\AdminMiddleware;
+use App\Jobs\WarmAnalyticsCache;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,7 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias(['is_admin' => AdminMiddleware::class]);
     })
+    ->withSchedule(function (Schedule $schedule): void {
+        // Warm analytics cache hourly
+        $schedule->job(new WarmAnalyticsCache)->hourly();
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
-            //
