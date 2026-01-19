@@ -24,6 +24,17 @@
 
     </flux:button>
 
+    {{-- Map Section --}}
+    @if($country->latitude && $country->longitude)
+        <div class="mb-6 rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+            <flux:heading size="lg" class="mb-4">Location on Map</flux:heading>
+            <div id="country-map-{{ $country->Code }}" class="h-96 w-full rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800" style="height: 384px;" wire:ignore></div>
+            <div class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                Coordinates: {{ number_format($country->latitude, 4) }}°N, {{ number_format($country->longitude, 4) }}°E
+            </div>
+        </div>
+    @endif
+
     <div class="grid gap-6 md:grid-cols-2">
         {{-- Weather Card --}}
         <livewire:weather-card
@@ -158,6 +169,95 @@
                 @endforelse
             </div>
         </div>
+
+        {{-- Exchange Rates --}}
+        @if($this->exchangeRates)
+            <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                <flux:heading size="lg" class="mb-4">
+                    Currency Exchange Rates
+                    <flux:badge size="sm" color="blue" class="ml-2">{{ $country->currency_code }}</flux:badge>
+                </flux:heading>
+                <div class="space-y-3 text-sm">
+                    @if($country->currency_name)
+                        <div class="mb-3 text-gray-600 dark:text-gray-400">
+                            {{ $country->currency_name }}
+                        </div>
+                    @endif
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div class="flex justify-between rounded bg-gray-50 p-3 dark:bg-gray-800/50">
+                            <span class="text-gray-600 dark:text-gray-400">1 {{ $this->exchangeRates['base'] }} to USD:</span>
+                            <span class="font-semibold">${{ number_format($this->exchangeRates['usd'], 4) }}</span>
+                        </div>
+                        <div class="flex justify-between rounded bg-gray-50 p-3 dark:bg-gray-800/50">
+                            <span class="text-gray-600 dark:text-gray-400">1 {{ $this->exchangeRates['base'] }} to EUR:</span>
+                            <span class="font-semibold">€{{ number_format($this->exchangeRates['eur'], 4) }}</span>
+                        </div>
+                        <div class="flex justify-between rounded bg-gray-50 p-3 dark:bg-gray-800/50">
+                            <span class="text-gray-600 dark:text-gray-400">1 {{ $this->exchangeRates['base'] }} to GBP:</span>
+                            <span class="font-semibold">£{{ number_format($this->exchangeRates['gbp'], 4) }}</span>
+                        </div>
+                        <div class="flex justify-between rounded bg-gray-50 p-3 dark:bg-gray-800/50">
+                            <span class="text-gray-600 dark:text-gray-400">1 {{ $this->exchangeRates['base'] }} to JPY:</span>
+                            <span class="font-semibold">¥{{ number_format($this->exchangeRates['jpy'], 2) }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        Last updated: {{ $this->exchangeRates['lastUpdate'] }}
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- COVID-19 Statistics --}}
+        @if($this->covidStats)
+            <div class="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
+                <flux:heading size="lg" class="mb-4">
+                    COVID-19 Statistics
+                    <flux:badge size="sm" color="orange" class="ml-2">Live Data</flux:badge>
+                </flux:heading>
+                <div class="space-y-3 text-sm">
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div class="rounded bg-blue-50 p-3 dark:bg-blue-900/20">
+                            <div class="text-xs text-gray-600 dark:text-gray-400">Total Cases</div>
+                            <div class="text-lg font-bold">{{ number_format($this->covidStats['cases']) }}</div>
+                            @if($this->covidStats['todayCases'] > 0)
+                                <div class="text-xs text-blue-600 dark:text-blue-400">+{{ number_format($this->covidStats['todayCases']) }} today</div>
+                            @endif
+                        </div>
+                        <div class="rounded bg-red-50 p-3 dark:bg-red-900/20">
+                            <div class="text-xs text-gray-600 dark:text-gray-400">Total Deaths</div>
+                            <div class="text-lg font-bold">{{ number_format($this->covidStats['deaths']) }}</div>
+                            @if($this->covidStats['todayDeaths'] > 0)
+                                <div class="text-xs text-red-600 dark:text-red-400">+{{ number_format($this->covidStats['todayDeaths']) }} today</div>
+                            @endif
+                        </div>
+                        <div class="rounded bg-green-50 p-3 dark:bg-green-900/20">
+                            <div class="text-xs text-gray-600 dark:text-gray-400">Recovered</div>
+                            <div class="text-lg font-bold">{{ number_format($this->covidStats['recovered']) }}</div>
+                        </div>
+                        <div class="rounded bg-yellow-50 p-3 dark:bg-yellow-900/20">
+                            <div class="text-xs text-gray-600 dark:text-gray-400">Active Cases</div>
+                            <div class="text-lg font-bold">{{ number_format($this->covidStats['active']) }}</div>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 pt-3 dark:border-gray-700">
+                        <div class="grid gap-2 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Cases per million:</span>
+                                <span class="font-semibold">{{ number_format($this->covidStats['casesPerMillion']) }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Tests conducted:</span>
+                                <span class="font-semibold">{{ number_format($this->covidStats['tests']) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        Last updated: {{ \Carbon\Carbon::parse($this->covidStats['updated'])->diffForHumans() }}
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- Cities Section --}}
@@ -236,3 +336,63 @@
         @endif
     </div>
 </div>
+
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+@endpush
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+<script>
+    @if($country->latitude && $country->longitude)
+    document.addEventListener('livewire:navigated', function () {
+        initCountryMap();
+    });
+
+    window.addEventListener('load', function() {
+        initCountryMap();
+    });
+
+    function initCountryMap() {
+        const mapId = 'country-map-{{ $country->Code }}';
+        const mapElement = document.getElementById(mapId);
+        
+        if (!mapElement || mapElement.classList.contains('leaflet-container')) {
+            return;
+        }
+
+        setTimeout(function() {
+            try {
+                const map = L.map(mapId).setView([{{ $country->latitude }}, {{ $country->longitude }}], 5);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 18
+                }).addTo(map);
+                
+                const marker = L.marker([{{ $country->latitude }}, {{ $country->longitude }}]).addTo(map);
+                marker.bindPopup(
+                    '<div class="text-center p-2">' +
+                    '<img src="https://flagsapi.com/{{ $country->Code2 }}/flat/32.png" alt="{{ $country->Name }} flag" class="mx-auto mb-2" style="height:20px; width:32px;">' +
+                    '<strong>{{ $country->Name }}</strong><br>' +
+                    @if($country->capitalCity)
+                    'Capital: {{ $country->capitalCity->Name }}' +
+                    @endif
+                    '</div>'
+                ).openPopup();
+                
+                setTimeout(function() {
+                    map.invalidateSize();
+                }, 200);
+            } catch (error) {
+                console.error('Error initializing map:', error);
+            }
+        }, 300);
+    }
+    @endif
+</script>
+@endpush
