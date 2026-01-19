@@ -1,5 +1,10 @@
 # Country Explorer
 
+<img width="1896" height="1006" alt="image" src="https://github.com/user-attachments/assets/4b122eb7-9bc4-4f24-8dd2-1cae99f8b9e4" />
+<img width="1894" height="1003" alt="image" src="https://github.com/user-attachments/assets/11aa7a0f-0b5e-4faa-b468-8febd7948afc" />
+
+
+
 A comprehensive web application for exploring and discovering information about countries around the world.
 
 ## What This Application Does
