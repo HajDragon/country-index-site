@@ -93,6 +93,14 @@ class Country extends Model
     }
 
     /**
+     * Get the country's interactions
+     */
+    public function interactions(): HasMany
+    {
+        return $this->hasMany(CountryInteraction::class, 'country_id', 'Code');
+    }
+
+    /**
      * Get neighboring countries from REST Countries API
      *
      * @return array<int, array{code: string, name: string}>

@@ -74,4 +74,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserFavorite::class);
     }
+
+    /**
+     * Get the user's country interactions
+     */
+    public function countryInteractions(): HasMany
+    {
+        return $this->hasMany(CountryInteraction::class);
+    }
 }

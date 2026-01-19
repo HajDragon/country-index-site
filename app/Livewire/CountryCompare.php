@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Events\CountryInteracted;
 use App\Models\Country;
 use App\Traits\HasHomeNavigation;
 use Illuminate\Support\Str;
@@ -11,6 +12,7 @@ use Livewire\Component;
 class CountryCompare extends Component
 {
     use HasHomeNavigation;
+
     #[Url(as: 'codes')]
     public string $codesCsv = '';
 
@@ -22,6 +24,12 @@ class CountryCompare extends Component
         $codes = $this->codes();
         if (! in_array($normalized, $codes, true)) {
             $codes[] = $normalized;
+
+            // Track comparison interaction
+            $country = Country::where('Code', $normalized)->first();
+            if ($country) {
+                CountryInteracted::dispatch($country, 'compare', auth()->user());
+            }
         }
         // cap at 3
         $this->codesCsv = collect($codes)->take(3)->join(',');
