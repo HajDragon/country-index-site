@@ -184,7 +184,10 @@
 
     <div class="grid auto-rows-min gap-4 md:grid-cols-3 lg:grid-cols-4">
         @foreach($countries as $country)
-            <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
+            <div
+                data-aos="fade-down-right"
+                class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700"
+            >
                 <livewire:country-card :countryCode="$country->Code" :key="$country->Code" />
             </div>
         @endforeach

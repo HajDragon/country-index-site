@@ -27,15 +27,13 @@
         <div class="space-y-4">
             <div class="space-y-3">
                 <flux:input
-                    wire:model="searchTerm"
+                    wire:model.live.debounce.500ms="searchTerm"
                     wire:keydown.enter="performSearch"
                     type="text"
                     placeholder="Search countries by name, region, or capital..."
                     class="w-full bg-white dark:bg-gray-900 focus:!ring-0 focus:!outline-none"
                 />
-                <flux:button wire:click="performSearch" class="w-full" icon="magnifying-glass">
-                    Search
-                </flux:button>
+
                 <flux:select wire:model.live="sortBy" class="w-full">
                     <option value="name_asc">Name (A-Z)</option>
                     <option value="name_desc">Name (Z-A)</option>
@@ -44,10 +42,10 @@
                     <option value="continent">Continent</option>
                 </flux:select>
                 <flux:button wire:click="$toggle('showFilters')" variant="ghost" size="sm" class="w-full">
-                    <div wire:loading.remove>
+                    <div wire:loading.remove wire:target="showFilters">
                         {{ $showFilters ? 'Hide Filters' : 'Show Filters' }}
                     </div>
-                    <div wire:loading>Loading Filters...</div>
+                    <div wire:loading wire:target="showFilters">Loading Filters...</div>
                 </flux:button>
             </div>
 
