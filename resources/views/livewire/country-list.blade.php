@@ -11,9 +11,19 @@
         </div>
     </div>
 
+    <x-mobile-navbar
+        :continents="$continents"
+        :regions="$regions"
+        :population-min="$populationMin"
+        :population-max="$populationMax"
+        :life-expectancy-min="$lifeExpectancyMin"
+        :life-expectancy-max="$lifeExpectancyMax"
+        :show-filters="$showFilters"
+    />
+
     {{-- Search and Sort --}}
-    <div class="mb-6 flex gap-4">
-        <div class="flex-1 gradient-border-input dark:gradient-border-input-dark rounded-full flex">
+    <div class="mb-6 hidden gap-4 md:flex md:flex-row">
+        <div class="flex-1 gradient-border-input dark:gradient-border-input-dark rounded-full flex w-full">
             <flux:input
                 wire:model="searchTerm"
                 wire:keydown.enter="performSearch"
@@ -44,7 +54,7 @@
 
     {{-- Advanced Filters --}}
     @if($showFilters)
-    <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+    <div class="mb-6 hidden rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-white md:block">
         <div class="mb-4 flex items-center justify-between">
             <flux:heading size="lg" level="3">Advanced Filters</flux:heading>
             <flux:button wire:click="clearFilters" variant="ghost" size="sm">Clear All</flux:button>
@@ -119,8 +129,7 @@
         @endauth
     </div>
     @endif
-
-    <div class="mb-6 flex items-center justify-between">
+    <div class="mb-6 hidden items-center justify-between md:flex">
         <flux:heading size="xl" level="1">Hey {{ Auth::user()->name }}, you are sailing from {{ Auth::user()->origin }} Welcome to the Country indexing site</flux:heading>
         <div class="flex items-center gap-4">
             {{-- Profile Image and User Menu --}}
@@ -131,8 +140,9 @@
                     <img src="{{ asset('default-avatar.png') }}" alt="Default Image" class="h-10 w-10 rounded-full object-cover">
                 @endif
 
+                <flux:button href="/stats">Statistics</flux:button>
                 <flux:dropdown position="bottom" align="end">
-                    <flux:button variant="ghost" size="sm">
+                    <flux:button>
                         {{ Auth::user()->name }}
                     </flux:button>
 
@@ -180,6 +190,7 @@
             </div>
         @endforeach
     </div>
+
 
     <div class="mt-8 flex flex-col items-center gap-3">
         <nav class="flex items-center gap-1">

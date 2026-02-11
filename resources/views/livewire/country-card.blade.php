@@ -17,14 +17,29 @@
         <div class="mb-4 text-sm text-gray-400">Capital: {{ $country->capitalCity?->Name }}</div>
         <div class="mb-4 text-sm text-gray-400">Continent: {{ $country->Continent }}</div>
 
-        <div class="space-y-2">
+        {{-- <div class="space-y-2">
             @foreach($country->cities as $city)
                 <div class="border-b border-gray-200 pb-2 dark:border-gray-700">
                     <div class="font-medium">{{ $city->Name }}</div>
                     <div class="text-sm text-gray-600 dark:text-gray-400">{{ number_format($city->Population) }}</div>
                 </div>
             @endforeach
-        </div>
+        </div> --}}
+        @if (!empty($weatherData) && isset($weatherData['icon']))
+            <span class="text-4xl">{{ $weatherData['icon'] }}</span>
+            <div>
+                <div class="text-3xl font-bold">{{ round($weatherData['temperature']) }}°C</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $weatherData['description'] ?? 'Weather unavailable' }}
+                    <span class="text-gray-400 dark:text-gray-500">•</span>
+                    {{ (int) ($weatherData['humidity'] ?? 0) }}% humidity
+                    <span class="text-gray-400 dark:text-gray-500">•</span>
+                    {{ round((float) ($weatherData['windSpeed'] ?? 0)) }} km/h wind
+                </div>
+            </div>
+        @else
+            <div class="text-sm text-gray-500 dark:text-gray-400">Weather data unavailable</div>
+        @endif
     @else
         <div>Country not found in database</div>
     @endif
