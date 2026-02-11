@@ -1,4 +1,6 @@
 import './bootstrap.js';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 /**
  * Global Livewire loading state handler
@@ -20,6 +22,7 @@ document.addEventListener('livewire:init', function () {
         succeed(({ component }) => {
             isLoading = false;
             hideLoadingBar();
+            triggerAos();
         });
 
         fail(({ component }) => {
@@ -28,6 +31,49 @@ document.addEventListener('livewire:init', function () {
         });
     });
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    AOS.init({
+        once: true,
+    });
+});
+
+document.addEventListener('livewire:navigated', () => {
+    triggerAos(true);
+});
+
+function triggerAos(force = false) {
+    if (force) {
+        AOS.refreshHard();
+    } else {
+        AOS.refresh();
+    }
+
+    requestAnimationFrame(() => {
+        window.dispatchEvent(new Event('scroll'));
+    });
+
+    setTimeout(() => {
+        revealInViewportAos();
+    }, 150);
+}
+
+function revealInViewportAos() {
+    const elements = document.querySelectorAll('[data-aos]');
+
+    elements.forEach((element) => {
+        if (element.classList.contains('aos-animate')) {
+            return;
+        }
+
+        const rect = element.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+        if (isVisible) {
+            element.classList.add('aos-animate');
+        }
+    });
+}
 
 /**
  * Show a loading bar at the top of the page

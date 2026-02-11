@@ -62,6 +62,12 @@ class CountryList extends Component
         }
     }
 
+    public function updatedSearchTerm(): void
+    {
+        $this->search = $this->searchTerm;
+        $this->resetPage();
+    }
+
     public function updatedSearch(): void
     {
         $this->resetPage();
