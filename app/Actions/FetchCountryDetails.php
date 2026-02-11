@@ -40,7 +40,7 @@ class FetchCountryDetails
         try {
             return Cache::remember($cacheKey, 86400, function () use ($apiCode, $countryCode) {
                 $response = Http::withOptions([
-                    'verify' => config('app.env') === 'production',
+                    'verify' => config('services.http.verify'),
                 ])
                     ->timeout(10)
                     ->get('https://restcountries.com/v3.1/alpha/'.$apiCode, [
@@ -69,7 +69,7 @@ class FetchCountryDetails
                     // Fetch names for border countries in bulk
                     $borderCodes = $country['borders'];
                     $bordersResponse = Http::withOptions([
-                        'verify' => config('app.env') === 'production',
+                        'verify' => config('services.http.verify'),
                     ])
                         ->timeout(10)
                         ->get('https://restcountries.com/v3.1/alpha', [
