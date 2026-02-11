@@ -1,8 +1,8 @@
 <div class="relative">
-    {{-- Scoped loading overlay - only for search, pagination, exports, and filters --}}
+    {{-- Scoped loading overlay - only for search, exports, and filters --}}
     <div
-        wire:loading.delay
-        wire:target="performSearch,previousPage,nextPage,gotoPage,exportCsv,exportPdf,clearFilters,updatedSortBy,updatedSelectedContinents,updatedSelectedRegions,updatedPopulationMin,updatedPopulationMax,updatedLifeExpectancyMin,updatedLifeExpectancyMax,updatedShowFavoritesOnly"
+        wire:loading
+        wire:target="performSearch,exportCsv,exportPdf,clearFilters,updatedSortBy,updatedSelectedContinents,updatedSelectedRegions,updatedPopulationMin,updatedPopulationMax,updatedLifeExpectancyMin,updatedLifeExpectancyMax,updatedShowFavoritesOnly"
         class="absolute inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm rounded-lg"
     >
         <div class="flex flex-col items-center pt-100 gap-3">
@@ -130,6 +130,7 @@
     </div>
     @endif
     <div class="mb-6 hidden items-center justify-between md:flex">
+        <flux:brand class="!bg-white !text-black border-rounded-4xl"><img src="/storage/Logo/Logo.png" alt="CountryPedia Logo" class="h-8 w-auto">CountryPedia</flux:brand>
         <flux:heading size="xl" level="1">Hey {{ Auth::user()->name }}, you are sailing from {{ Auth::user()->origin }} Welcome to the Country indexing site</flux:heading>
         <div class="flex items-center gap-4">
             {{-- Profile Image and User Menu --}}
@@ -185,6 +186,7 @@
     <div class="grid auto-rows-min gap-4 md:grid-cols-3 lg:grid-cols-4">
         @foreach($countries as $country)
             <div
+                wire:key="country-{{ $country->Code }}"
                 data-aos="fade-down-right"
                 class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700"
             >
@@ -193,36 +195,61 @@
         @endforeach
     </div>
 
-
-    <div class="mt-8 flex flex-col items-center gap-3">
-        <nav class="flex items-center gap-1">
-            {{-- Previous Button --}}
-            @if ($countries->onFirstPage())
-                <span class="px-3 py-2 text-gray-400 dark:text-gray-600">Previous</span>
-            @else
-                <a wire:click="previousPage" class="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded">Previous</a>
-            @endif
-
-            {{-- Page Numbers --}}
-            @foreach ($countries->getUrlRange(max(1, $countries->currentPage() - 1), min($countries->lastPage(), $countries->currentPage() + 1)) as $page => $url)
-                @if ($page == $countries->currentPage())
-                    <span class="px-3 py-2 bg-blue-500 text-white rounded">{{ $page }}</span>
-                @else
-                    <a wire:click="gotoPage({{ $page }})" class="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded">{{ $page }}</a>
-                @endif
-            @endforeach
-
-            {{-- Next Button --}}
-            @if ($countries->hasMorePages())
-                <a wire:click="nextPage" class="cursor-pointer px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 rounded">Next</a>
-            @else
-                <span class="px-3 py-2 text-gray-400 dark:text-gray-600">Next</span>
-            @endif
-        </nav>
-
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-            Showing {{ $countries->firstItem() }} to {{ $countries->lastItem() }} of {{ $countries->total() }} results
-        </p>
+    {{-- Debug info --}}
+    <div class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
+        Showing {{ count($countries) }} of {{ $totalCount }} countries | Page: {{ $page }}
     </div>
+
+    {{-- Infinite scroll trigger --}}
+    @if($hasMore)
+        <div
+            x-data="{
+                loading: false,
+                observe() {
+                    console.log('Setting up intersection observer for infinite scroll');
+                    let observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            console.log('Intersection detected:', entry.isIntersecting, 'Loading:', this.loading);
+                            if (entry.isIntersecting && !this.loading) {
+                                console.log('Triggering loadMore...');
+                                this.loading = true;
+                                this.$wire.loadMore().then(() => {
+                                    console.log('loadMore completed');
+                                    // Reset loading immediately for faster subsequent loads
+                                    setTimeout(() => {
+                                        this.loading = false;
+                                        console.log('Ready for next load');
+                                    }, 100);
+                                });
+                            }
+                        });
+                    }, {
+                        rootMargin: '400px',
+                        threshold: 0.01
+                    });
+                    observer.observe(this.$el);
+                    console.log('Intersection observer attached');
+                }
+            }"
+            x-init="observe()"
+            style="display: flex; justify-content: center; align-items: center; width: 100%;"
+            class="mt-8 py-8"
+        >
+            <div wire:loading wire:target="loadMore" style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
+
+                <p class="text-gray-600 dark:text-gray-400 font-medium">Loading more countries...</p>
+            </div>
+            <div wire:loading.remove wire:target="loadMore" style="text-align: center; width: 100%;">
+                <span class="text-gray-400 dark:text-gray-600 text-sm">Scroll to load more (Page: {{ $page }})</span>
+            </div>
+        </div>
+    @else
+        <div style="display: flex; justify-content: center; align-items: center; width: 100%;" class="mt-8 py-8 flex-col gap-3">
+            <p class="text-gray-600 dark:text-gray-400 font-medium">No more countries to load</p>
+            <p class="text-sm text-gray-500 dark:text-gray-500">
+                Showing all {{ $totalCount }} {{ Str::plural('country', $totalCount) }}
+            </p>
+        </div>
+    @endif
 </div>
 </div>

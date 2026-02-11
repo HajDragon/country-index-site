@@ -8,13 +8,10 @@ use App\Models\Country;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
-use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CountryList extends Component
 {
-    use WithPagination;
-
     public $search = '';
 
     public $searchTerm = '';
@@ -22,6 +19,15 @@ class CountryList extends Component
     public $sortBy = 'name_asc';
 
     public $showFavoritesOnly = false;
+
+    // Infinite scroll properties
+    public int $perPage = 12;
+
+    public int $page = 1;
+
+    public bool $hasMore = true;
+
+    public array $loadedCountryCodes = [];
 
     // Filter properties
     public $selectedContinents = [];
@@ -47,7 +53,7 @@ class CountryList extends Component
     public function performSearch(): void
     {
         $this->search = $this->searchTerm;
-        $this->resetPage();
+        $this->resetScroll();
 
         // Track search interaction
         if (! empty($this->searchTerm)) {
@@ -65,52 +71,64 @@ class CountryList extends Component
     public function updatedSearchTerm(): void
     {
         $this->search = $this->searchTerm;
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function updatedSearch(): void
     {
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function updatedSortBy(): void
     {
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function updatedSelectedContinents(): void
     {
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function updatedSelectedRegions(): void
     {
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function updatedPopulationMin(): void
     {
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function updatedPopulationMax(): void
     {
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function updatedLifeExpectancyMin(): void
     {
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function updatedLifeExpectancyMax(): void
     {
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function updatedShowFavoritesOnly(): void
     {
-        $this->resetPage();
+        $this->resetScroll();
+    }
+
+    public function resetScroll(): void
+    {
+        $this->page = 1;
+        $this->hasMore = true;
+        $this->loadedCountryCodes = [];
+    }
+
+    public function loadMore(): void
+    {
+        $this->page++;
     }
 
     public function clearFilters(): void
@@ -121,24 +139,50 @@ class CountryList extends Component
         $this->populationMax = 2000000000;
         $this->lifeExpectancyMin = 0;
         $this->lifeExpectancyMax = 100;
-        $this->resetPage();
+        $this->resetScroll();
     }
 
     public function render()
     {
-        $continents = Country::distinct()->pluck('Continent')->sort();
-        $regions = Country::distinct()->pluck('Region')->sort();
+        // Cache these queries - they rarely change
+        $continents = cache()->remember('continents_list', 3600, fn () => Country::distinct()->pluck('Continent')->sort()
+        );
+        $regions = cache()->remember('regions_list', 3600, fn () => Country::distinct()->pluck('Region')->sort()
+        );
 
-        $query = $this->search
-            ? Country::search($this->search)->query(fn ($query) => $this->applyFilters($query))
-            : $this->applyFilters(Country::query());
+        $isSearching = ! empty($this->search);
+        $limit = $this->page * $this->perPage;
 
-        $countries = $query->paginate(12);
+        if ($isSearching) {
+            // For Scout search - optimized with single query
+            $allResults = Country::search($this->search)
+                ->query(fn ($query) => $this->applyFilters($query))
+                ->get();
+
+            $totalCount = $allResults->count();
+            $countries = $allResults->take($limit);
+        } else {
+            // For regular Eloquent query - optimized with eager loading
+            $query = $this->applyFilters(Country::query()->with('capitalCity'));
+
+            // Get count efficiently
+            $totalCount = $query->count();
+
+            // Get paginated results
+            $countries = $query->take($limit)->get();
+        }
+
+        // Track loaded country codes
+        $this->loadedCountryCodes = $countries->pluck('Code')->toArray();
+
+        // Update hasMore flag
+        $this->hasMore = $totalCount > $limit;
 
         return view('livewire.country-list', [
             'countries' => $countries,
             'continents' => $continents,
             'regions' => $regions,
+            'totalCount' => $totalCount,
         ]);
     }
 
