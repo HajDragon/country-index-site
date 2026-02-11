@@ -6,6 +6,7 @@ namespace App\Livewire;
 
 use App\Actions\FetchWeatherData;
 use App\Models\Country;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class WeatherCard extends Component
@@ -91,7 +92,7 @@ class WeatherCard extends Component
         }
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.weather-card');
     }
