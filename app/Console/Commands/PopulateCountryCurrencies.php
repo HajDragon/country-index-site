@@ -33,7 +33,7 @@ class PopulateCountryCurrencies extends Command
 
         try {
             $response = Http::withOptions([
-                'verify' => config('app.env') === 'production',
+                'verify' => config('services.http.verify'),
             ])->timeout(30)->get('https://restcountries.com/v3.1/all', [
                 'fields' => 'cca3,currencies',
             ]);

@@ -37,7 +37,7 @@ class FetchCovidStats
         try {
             return Cache::remember($cacheKey, 86400, function () use ($countryName) {
                 $response = Http::withOptions([
-                    'verify' => config('app.env') === 'production',
+                    'verify' => config('services.http.verify'),
                 ])
                     ->timeout(10)
                     ->get('https://disease.sh/v3/covid-19/countries/'.urlencode($countryName), [
