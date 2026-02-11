@@ -7,15 +7,23 @@
     'lifeExpectancyMax' => 0,
     'showFilters' => false,
 ])
+<div class="grid grid-rows-1">
+    <div class="mb-6 md:hidden" x-data="{ open: false }" data-test="mobile-navbar">
+        <div class="relative flex items-center justify-center mb-4">
+            <div class="absolute left-0">
+                <flux:button variant="ghost" size="sm" icon="bars-2" x-on:click="open = ! open">
+                    <span x-text="open ? 'Close' : 'Options'"></span>
+                </flux:button>
+            </div>
 
-<div class="mb-6 md:hidden" x-data="{ open: false }" data-test="mobile-navbar">
-    <div class="flex items-center justify-start gap-3">
-        <flux:button variant="ghost" size="sm" icon="bars-2" x-on:click="open = ! open">
-            <span x-text="open ? 'Close' : 'Options'"></span>
-        </flux:button>
-    </div>
+            {{-- Simplified logo test --}}
+            <div href ="{{ route('home') }}" wire:navigate class="flex items-center gap-2">
+                <img src="/storage/Logo/Logo.png" alt="CountryPedia Logo" class="h-8 w-auto">
+                <span class="font-semibold text-lg text-black dark:text-white">CountryPedia</span>
+            </div>
+        </div>
 
-    <div x-cloak x-show="open" x-transition class="mt-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+        <div x-cloak x-show="open" x-transition class="mt-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
         <div class="space-y-4">
             <div class="space-y-3">
                 <flux:input
@@ -156,6 +164,7 @@
                     </div>
                 </flux:navlist.group>
             </flux:navlist>
+        </div>
         </div>
     </div>
 </div>
