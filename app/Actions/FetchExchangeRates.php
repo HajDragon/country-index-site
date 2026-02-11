@@ -30,7 +30,7 @@ class FetchExchangeRates
         try {
             return Cache::remember($cacheKey, 21600, function () use ($currencyCode) {
                 $response = Http::withOptions([
-                    'verify' => config('services.http.verify'),
+                    'verify' => config('app.env') === 'production',
                 ])
                     ->timeout(10)
                     ->get("https://api.exchangerate-api.com/v4/latest/{$currencyCode}");

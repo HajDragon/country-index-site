@@ -8,7 +8,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
 class FetchWeatherData
 {
@@ -41,7 +40,7 @@ class FetchWeatherData
         try {
             return Cache::remember($cacheKey, 3600, function () use ($latitude, $longitude, $withDaily, $dailyDays, $withHourly) {
                 $response = Http::withOptions([
-                    'verify' => config('services.http.verify'),
+                    'verify' => config('app.env') === 'production',
                 ])
                     ->timeout(10)
                     ->get('https://api.open-meteo.com/v1/forecast', array_filter([
@@ -90,7 +89,7 @@ class FetchWeatherData
 
                 return $result;
             });
-        } catch (Throwable $e) {
+        } catch (\Exception $e) {
             Log::error('Weather API exception', [
                 'message' => $e->getMessage(),
                 'latitude' => $latitude,

@@ -35,8 +35,4 @@ return [
         ],
     ],
 
-    'http' => [
-        'verify' => env('HTTP_CLIENT_VERIFY', env('APP_ENV') === 'production'),
-    ],
-
 ];

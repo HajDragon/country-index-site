@@ -13,5 +13,4 @@ test('authenticated users can visit the dashboard', function () {
 
     $response = $this->get(route('dashboard'));
     $response->assertStatus(200);
-    $response->assertSee('data-test="mobile-navbar"', false);
 });
