@@ -2,9 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Actions\FetchCovidStats;
+use App\Actions\FetchExchangeRates;
 use App\Events\CountryInteracted;
 use App\Models\Country;
 use App\Traits\HasHomeNavigation;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -26,6 +29,22 @@ class IndividualCountryView extends Component
 
         // Track country view
         CountryInteracted::dispatch($this->country, 'view', auth()->user());
+    }
+
+    #[Computed]
+    public function exchangeRates(): ?array
+    {
+        if (! $this->country->currency_code) {
+            return null;
+        }
+
+        return app(FetchExchangeRates::class)->execute($this->country->currency_code);
+    }
+
+    #[Computed]
+    public function covidStats(): ?array
+    {
+        return app(FetchCovidStats::class)->execute($this->country->Name);
     }
 
     public function render()

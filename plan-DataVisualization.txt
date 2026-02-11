@@ -1,0 +1,667 @@
+# Implementation Plan: Enhanced Data Visualization
+
+## Overview
+Enhance the statistics page with interactive maps and data visualizations that provide rich, engaging ways to explore country data using modern JavaScript mapping libraries.
+
+---
+
+## Phase 1: Technology Stack Selection & Setup
+
+### 1.1 Choose Mapping Library
+**Recommended: Leaflet.js** (Free, Open Source, Lightweight)
+- Pros: No API keys, extensive plugin ecosystem, excellent documentation
+- Cons: Requires custom styling for advanced features
+
+**Alternative: Mapbox GL JS** (Freemium)
+- Pros: Beautiful default styles, powerful styling engine, vector tiles
+- Cons: Requires API key, 50k free monthly loads
+
+**Decision Factors:**
+- Budget: Leaflet (free) vs Mapbox (freemium)
+- Styling needs: Mapbox has superior defaults
+- Data volume: Both handle our scale well
+
+### 1.2 Install Dependencies
+```bash
+npm install leaflet leaflet.markercluster chart.js @alpinejs/intersect
+```
+
+**Package Purposes:**
+- `leaflet`: Core mapping library
+- `leaflet.markercluster`: Cluster nearby markers for performance
+- `chart.js`: Time-series charts for trends
+- `@alpinejs/intersect`: Lazy-load visualizations when visible
+
+### 1.3 Add to Vite Config
+```javascript
+// vite.config.js
+export default {
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'leaflet': ['leaflet'],
+                    'charts': ['chart.js']
+                }
+            }
+        }
+    }
+}
+```
+
+---
+
+## Phase 2: Interactive World Map
+
+### 2.1 Create Map Component (Volt)
+**File:** `resources/views/livewire/components/interactive-world-map.blade.php`
+
+**Features:**
+- Display all countries with clickable regions
+- Color-coded by selected metric (population, GDP, life expectancy)
+- Hover tooltips with quick stats
+- Click to open detailed country modal/sidebar
+- Pan & zoom controls
+- Legend with color scale
+
+**Data Requirements:**
+- Country coordinates (lat/long for centroids) - Already available in `CountryCoordinatesSeeder`
+- GeoJSON boundaries for country shapes
+- Metric data (population, GDP, life expectancy)
+
+### 2.2 Add GeoJSON Data
+**Options:**
+1. Use public CDN: `https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json`
+2. Self-host: Download and store in `public/data/countries.geojson`
+3. Database: Store in `country_boundaries` table (large, but fastest)
+
+**Recommended:** Option 2 (Self-host) for reliability and speed
+
+### 2.3 Map Interaction Logic
+```javascript
+// Alpine.js component structure
+Alpine.data('worldMap', () => ({
+    map: null,
+    metric: 'population', // population, gdp, life_expectancy
+
+    init() {
+        this.initMap();
+        this.loadCountryData();
+    },
+
+    initMap() {
+        // Initialize Leaflet map
+        // Set default view (center on world)
+        // Add tile layer
+    },
+
+    loadCountryData() {
+        // Fetch country data via Livewire
+        // Apply choropleth coloring based on metric
+    },
+
+    switchMetric(newMetric) {
+        // Re-color map based on selected metric
+        // Update legend
+    },
+
+    onCountryClick(countryCode) {
+        // Dispatch Livewire event to show country details
+        // Or redirect to individual country page
+    }
+}))
+```
+
+### 2.4 Styling & Color Schemes
+**Choropleth Color Scales:**
+- Population: Blue gradient (light → dark)
+- GDP per Capita: Green gradient (light → dark)
+- Life Expectancy: Red-Yellow-Green diverging scale
+
+**Use ColorBrewer palettes for accessibility:**
+- Sequential: For continuous data (population, GDP)
+- Diverging: For data with meaningful midpoint (life expectancy vs. world average)
+
+---
+
+## Phase 3: Population Density Heatmap
+
+### 3.1 Create Heatmap Component
+**File:** `resources/views/livewire/components/population-density-heatmap.blade.php`
+
+**Visualization Type:** Choropleth Map
+- Each country colored by population density (people/km²)
+- Legend showing density ranges
+- Filter by continent
+
+### 3.2 Calculate Population Density
+**Add to Country Model:**
+```php
+// app/Models/Country.php
+public function getPopulationDensityAttribute(): float
+{
+    if (!$this->area_km2 || $this->area_km2 == 0) {
+        return 0;
+    }
+
+    return round($this->population / $this->area_km2, 2);
+}
+```
+
+**Create Migration to Add Area Column:**
+```php
+Schema::table('countries', function (Blueprint $table) {
+    $table->decimal('area_km2', 12, 2)->nullable()->after('population');
+});
+```
+
+### 3.3 Density Classification
+**Create Color Buckets:**
+1. Very Low: < 10 people/km²
+2. Low: 10-50 people/km²
+3. Medium: 50-150 people/km²
+4. High: 150-300 people/km²
+5. Very High: > 300 people/km²
+
+### 3.4 Interactive Features
+- Hover: Show exact density value
+- Click: Compare with neighboring countries
+- Toggle: Switch between total population and density
+- Filter: Show only countries above/below threshold
+
+---
+
+## Phase 4: GDP per Capita Choropleth Map
+
+### 4.1 Create GDP Map Component
+**File:** `resources/views/livewire/components/gdp-choropleth-map.blade.php`
+
+**Features:**
+- Color countries by GDP per capita (PPP)
+- Currency-normalized display (USD)
+- Compare GDP nominal vs. PPP
+- Adjust for inflation (if historical data added)
+
+### 4.2 GDP Data Preparation
+**Add to Country Model:**
+```php
+public function getGdpPerCapitaAttribute(): float
+{
+    if (!$this->population || $this->population == 0) {
+        return 0;
+    }
+
+    return round($this->gnp / $this->population, 2);
+}
+```
+
+### 4.3 Economic Classification
+**Income Level Buckets (World Bank):**
+1. Low income: < $1,085
+2. Lower-middle income: $1,086 - $4,255
+3. Upper-middle income: $4,256 - $13,205
+4. High income: > $13,205
+
+### 4.4 Additional GDP Insights
+**Overlay Options:**
+- Show GDP growth rate (if available)
+- Economic freedom index
+- Trade balance indicators
+- Regional economic blocs (EU, ASEAN, etc.)
+
+---
+
+## Phase 5: Life Expectancy Trends Over Time
+
+### 5.1 Historical Data Structure
+**Create New Table:**
+```php
+// Migration: create_country_historical_data_table.php
+Schema::create('country_historical_data', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('country_id')->constrained()->cascadeOnDelete();
+    $table->integer('year');
+    $table->decimal('life_expectancy', 5, 2)->nullable();
+    $table->bigInteger('population')->nullable();
+    $table->decimal('gdp_per_capita', 12, 2)->nullable();
+    $table->decimal('infant_mortality_rate', 5, 2)->nullable();
+    $table->timestamps();
+
+    $table->unique(['country_id', 'year']);
+    $table->index(['year']);
+});
+```
+
+**Model:**
+```php
+// app/Models/CountryHistoricalData.php
+class CountryHistoricalData extends Model
+{
+    protected $table = 'country_historical_data';
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+}
+```
+
+### 5.2 Data Sources for Historical Data
+**Recommended APIs/Datasets:**
+1. **World Bank API** (Free, comprehensive)
+   - Life expectancy: `SP.DYN.LE00.IN`
+   - GDP per capita: `NY.GDP.PCAP.CD`
+   - Population: `SP.POP.TOTL`
+
+2. **UN Data** (Free, authoritative)
+
+3. **Our World in Data** (CSV downloads)
+
+### 5.3 Create Trend Chart Component
+**File:** `resources/views/livewire/components/life-expectancy-trends.blade.php`
+
+**Chart Features:**
+- Line chart showing life expectancy over time
+- Multi-country comparison (up to 5 countries)
+- Year range selector (1960-2024)
+- Continent average overlay
+- World average overlay
+- Hover tooltips with year/value
+- Export chart as PNG
+
+**Use Chart.js:**
+```javascript
+Alpine.data('lifeExpectancyChart', () => ({
+    chart: null,
+    selectedCountries: [],
+    yearRange: [1960, 2024],
+
+    init() {
+        this.renderChart();
+    },
+
+    async renderChart() {
+        const data = await this.fetchHistoricalData();
+
+        this.chart = new Chart(this.$refs.canvas, {
+            type: 'line',
+            data: {
+                labels: this.getYearLabels(),
+                datasets: this.buildDatasets(data)
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: { /* custom tooltip */ },
+                    legend: { position: 'bottom' }
+                },
+                scales: {
+                    y: {
+                        title: { text: 'Life Expectancy (years)' }
+                    }
+                }
+            }
+        });
+    },
+
+    addCountry(countryCode) {
+        // Add country to comparison
+        // Re-render chart
+    },
+
+    removeCountry(countryCode) {
+        // Remove from comparison
+        // Re-render chart
+    }
+}))
+```
+
+### 5.4 Additional Trend Visualizations
+**Create Multi-Metric Comparison:**
+- Life expectancy vs. GDP per capita (scatter plot)
+- Infant mortality vs. Life expectancy (correlation chart)
+- Population growth trends
+- Urbanization rate trends
+
+---
+
+## Phase 6: Integrate into Statistics Page
+
+### 6.1 Redesign Statistics Layout
+**Current:** `resources/views/livewire/pages/statistics.blade.php`
+
+**New Structure:**
+```blade
+@volt('pages.statistics')
+<x-layouts.app>
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <!-- Page Header -->
+        <div class="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
+            <flux:heading size="xl">Global Country Statistics</flux:heading>
+            <flux:text>Explore interactive visualizations of global data</flux:text>
+        </div>
+
+        <!-- Visualization Tabs -->
+        <div class="px-6 py-6" x-data="{ activeTab: 'world-map' }">
+            <flux:tabs>
+                <flux:tab name="world-map">Interactive Map</flux:tab>
+                <flux:tab name="population">Population Density</flux:tab>
+                <flux:tab name="gdp">Economic Data</flux:tab>
+                <flux:tab name="trends">Historical Trends</flux:tab>
+            </flux:tabs>
+
+            <!-- Tab Content -->
+            <div class="mt-8">
+                <!-- World Map Panel -->
+                <div x-show="activeTab === 'world-map'">
+                    <livewire:components.interactive-world-map />
+                </div>
+
+                <!-- Population Density Panel -->
+                <div x-show="activeTab === 'population'" x-cloak>
+                    <livewire:components.population-density-heatmap />
+                </div>
+
+                <!-- GDP Panel -->
+                <div x-show="activeTab === 'gdp'" x-cloak>
+                    <livewire:components.gdp-choropleth-map />
+                </div>
+
+                <!-- Historical Trends Panel -->
+                <div x-show="activeTab === 'trends'" x-cloak>
+                    <livewire:components.life-expectancy-trends />
+                </div>
+            </div>
+        </div>
+
+        <!-- Existing Statistics Cards (Below Maps) -->
+        <div class="px-6 py-8">
+            <!-- Your existing statistics cards -->
+        </div>
+    </div>
+</x-layouts.app>
+@endvolt
+```
+
+### 6.2 Lazy Loading Strategy
+**Use Alpine Intersect:**
+```blade
+<div
+    x-data="{ loaded: false }"
+    x-intersect.once="loaded = true"
+>
+    <template x-if="loaded">
+        <livewire:components.interactive-world-map />
+    </template>
+    <template x-if="!loaded">
+        <flux:skeleton class="h-96" />
+    </template>
+</div>
+```
+
+---
+
+## Phase 7: Performance Optimization
+
+### 7.1 Map Data Caching
+```php
+// app/Services/MapDataService.php
+class MapDataService
+{
+    public function getMapData(string $metric): array
+    {
+        return Cache::remember("map_data_{$metric}", 3600, function () use ($metric) {
+            return Country::query()
+                ->with('coordinates')
+                ->get()
+                ->map(function ($country) use ($metric) {
+                    return [
+                        'code' => $country->code,
+                        'name' => $country->name,
+                        'value' => $country->{$metric},
+                        'lat' => $country->coordinates->latitude ?? 0,
+                        'lng' => $country->coordinates->longitude ?? 0,
+                    ];
+                })
+                ->toArray();
+        });
+    }
+}
+```
+
+### 7.2 GeoJSON Optimization
+- Simplify geometries (reduce polygon points)
+- Use TopoJSON instead of GeoJSON (smaller file size)
+- Compress with gzip/brotli
+
+### 7.3 Chart Data Optimization
+- Paginate historical data requests
+- Aggregate by decade for long time ranges
+- Use web workers for heavy computations
+
+---
+
+## Phase 8: Testing
+
+### 8.1 Feature Tests
+```php
+// tests/Feature/DataVisualizationTest.php
+test('statistics page renders map component', function () {
+    $this->get('/statistics')
+        ->assertSeeLivewire('components.interactive-world-map');
+});
+
+test('map data service returns correct format', function () {
+    $service = app(MapDataService::class);
+    $data = $service->getMapData('population');
+
+    expect($data)->toBeArray()
+        ->and($data[0])->toHaveKeys(['code', 'name', 'value', 'lat', 'lng']);
+});
+
+test('historical data can be queried by year range', function () {
+    $country = Country::factory()->create();
+    CountryHistoricalData::factory()->count(10)->create([
+        'country_id' => $country->id,
+    ]);
+
+    $data = $country->historicalData()
+        ->whereBetween('year', [2000, 2010])
+        ->get();
+
+    expect($data)->toHaveCount(10);
+});
+```
+
+### 8.2 Browser Tests
+```php
+// tests/Browser/InteractiveMapTest.php
+test('user can interact with world map', function () {
+    visit('/statistics')
+        ->click('@map-tab')
+        ->pause(1000) // Wait for map to load
+        ->assertSee('Interactive World Map')
+        ->click('@country-USA') // Click on USA
+        ->assertSee('United States')
+        ->assertSee('Population:');
+});
+```
+
+---
+
+## Phase 9: Data Seeding
+
+### 9.1 Create Historical Data Seeder
+```php
+// database/seeders/CountryHistoricalDataSeeder.php
+class CountryHistoricalDataSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $countries = Country::all();
+        $years = range(1960, 2024);
+
+        foreach ($countries as $country) {
+            $baseLifeExpectancy = rand(50, 80);
+
+            foreach ($years as $year) {
+                // Simulate gradual improvement
+                $lifeExpectancy = $baseLifeExpectancy + (($year - 1960) * 0.2);
+
+                CountryHistoricalData::create([
+                    'country_id' => $country->id,
+                    'year' => $year,
+                    'life_expectancy' => round($lifeExpectancy, 2),
+                    'population' => $country->population * (1 + (($year - 2024) * 0.01)),
+                    'gdp_per_capita' => $country->gnp / $country->population * (1 + (($year - 2024) * 0.02)),
+                ]);
+            }
+        }
+    }
+}
+```
+
+### 9.2 Add Area Data Seeder
+```php
+// database/seeders/CountryAreaSeeder.php
+class CountryAreaSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Real-world area data for top countries
+        $areas = [
+            'USA' => 9833517,  // km²
+            'CHN' => 9596961,
+            'CAN' => 9984670,
+            'RUS' => 17098242,
+            // ... add more
+        ];
+
+        foreach ($areas as $code => $area) {
+            Country::where('code', $code)->update(['area_km2' => $area]);
+        }
+
+        // Generate realistic areas for remaining countries
+        Country::whereNull('area_km2')->each(function ($country) {
+            $country->update(['area_km2' => rand(10000, 2000000)]);
+        });
+    }
+}
+```
+
+---
+
+## Implementation Priority
+
+### ✅ High Priority (MVP)
+1. Interactive world map with clickable countries
+2. Population density heatmap
+3. Basic historical trend chart (life expectancy)
+4. GeoJSON data integration
+5. Tab-based navigation on statistics page
+
+### 🔵 Medium Priority
+1. GDP per capita choropleth
+2. Multi-country trend comparison
+3. Map metric switcher (population/GDP/life expectancy)
+4. Lazy loading with Alpine Intersect
+5. Chart.js export functionality
+
+### 🟡 Low Priority (Future Enhancement)
+1. 3D globe visualization
+2. Animated time-lapse of historical changes
+3. User-saved map configurations
+4. Embeddable widgets for sharing
+5. Real-time data updates via WebSockets
+6. Advanced filtering (by region, income level, etc.)
+
+---
+
+## Technical Considerations
+
+### Performance
+- Lazy load maps only when tab is visible
+- Cache GeoJSON and country data aggressively
+- Use CDN for map tiles
+- Implement virtualization for large datasets
+- Consider Service Workers for offline functionality
+
+### Accessibility
+- Provide text alternatives for all visual data
+- Keyboard navigation for map interactions
+- Screen reader announcements for data changes
+- High contrast mode for maps
+- Respect `prefers-reduced-motion`
+
+### Mobile Responsiveness
+- Touch-friendly map controls
+- Responsive chart legends
+- Simplified mobile map view
+- Swipe gestures for chart navigation
+
+### Browser Compatibility
+- Test on Chrome, Firefox, Safari, Edge
+- Polyfills for older browsers if needed
+- Fallback for browsers without JS
+
+---
+
+## File Structure Overview
+
+```
+app/
+├── Services/
+│   └── MapDataService.php
+├── Models/
+│   └── CountryHistoricalData.php
+resources/
+└── views/
+    └── livewire/
+        ├── components/
+        │   ├── interactive-world-map.blade.php
+        │   ├── population-density-heatmap.blade.php
+        │   ├── gdp-choropleth-map.blade.php
+        │   └── life-expectancy-trends.blade.php
+        └── pages/
+            └── statistics.blade.php (enhanced)
+database/
+├── migrations/
+│   ├── add_area_to_countries_table.php
+│   └── create_country_historical_data_table.php
+└── seeders/
+    ├── CountryAreaSeeder.php
+    └── CountryHistoricalDataSeeder.php
+tests/
+├── Feature/
+│   └── DataVisualizationTest.php
+└── Browser/
+    └── InteractiveMapTest.php
+public/
+└── data/
+    └── countries.geojson
+```
+
+---
+
+## Estimated Timeline
+
+- **Phase 1-2:** 2-3 days (Setup + Interactive Map)
+- **Phase 3:** 1 day (Population Heatmap)
+- **Phase 4:** 1 day (GDP Choropleth)
+- **Phase 5:** 2-3 days (Historical Trends + Data Collection)
+- **Phase 6:** 1 day (Integration)
+- **Phase 7-8:** 2 days (Optimization + Testing)
+- **Phase 9:** 1 day (Seeding)
+
+**Total:** ~10-13 days for full implementation
+
+---
+
+## Next Steps
+
+1. Choose between Leaflet.js and Mapbox
+2. Install npm dependencies
+3. Download/host GeoJSON data
+4. Create database migrations for historical data
+5. Build first component (Interactive World Map)
+6. Iterate and enhance based on user feedback

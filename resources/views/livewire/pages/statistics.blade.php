@@ -60,25 +60,33 @@ new class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen bg-white dark:bg-gray-900 dark:text-white ">
+<div class="min-h-screen bg-white dark:bg-gray-900 dark:text-white">
     <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {{-- Header --}}
         <div class="mb-8 flex items-center justify-between">
             <div>
                 <flux:heading size="2xl" level="1">World Statistics</flux:heading>
-                <p class="mt-2 text-gray-600 dark:text-gray-400">Global country data insights and analytics</p>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">Global country data insights and interactive visualizations</p>
             </div>
             <div class="flex items-center gap-3">
                 <livewire:actions.dark-mode-toggle />
                 <flux:button variant="ghost" icon="arrow-left" icon:variant="outline" size="sm"
-                wire:click="goHome"
-                class="rounded bg-blue-600 px-2 py-1 text-xs font-semibold text-white shadow hover:bg-blue-700"
-                onclick="event.stopPropagation();">
-                <div wire:loading.remove>Back</div>
-            <div wire:loading>Going back...</div>
-
-        </flux:button>
+                    wire:click="goHome"
+                    class="rounded bg-blue-600 px-2 py-1 text-xs font-semibold text-white shadow hover:bg-blue-700"
+                    onclick="event.stopPropagation();">
+                    <div wire:loading.remove>Back</div>
+                    <div wire:loading>Going back...</div>
+                </flux:button>
             </div>
+        </div>
+
+        {{-- Interactive World Map Section --}}
+        <div class="mb-8">
+            <div class="mb-4">
+                <flux:heading size="lg">Interactive World Map</flux:heading>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Explore countries by different metrics. Click on markers to view details.</p>
+            </div>
+            <livewire:components.interactive-world-map />
         </div>
 
         {{-- Main Stats Grid --}}

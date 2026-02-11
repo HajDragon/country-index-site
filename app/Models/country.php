@@ -42,6 +42,8 @@ class Country extends Model
         'Code2',
         'latitude',
         'longitude',
+        'currency_code',
+        'currency_name',
     ];
 
     protected $casts = [
